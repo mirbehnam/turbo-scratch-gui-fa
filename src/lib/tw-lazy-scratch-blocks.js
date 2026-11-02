@@ -1,3 +1,5 @@
+import {installAndroidNumberInput} from './android-bridge';
+
 let _ScratchBlocks = null;
 
 const isLoaded = () => !!_ScratchBlocks;
@@ -16,6 +18,7 @@ const load = () => {
     return import(/* webpackChunkName: "sb" */ 'scratch-blocks')
         .then(m => {
             _ScratchBlocks = m.default;
+            installAndroidNumberInput(_ScratchBlocks);
             return _ScratchBlocks;
         });
 };

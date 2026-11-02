@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {intlShape, injectIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import log from '../lib/log';
+import {registerAndroidProjectLoader, readAndroidProject} from './android-bridge';
 import sharedMessages from './shared-messages';
 import {setFileHandle, setProjectError} from '../reducers/tw';
 
@@ -44,11 +45,18 @@ const SBFileUploaderHOC = function (WrappedComponent) {
                 'handleFinishedLoadingUpload',
                 'handleStartSelectingFileUpload',
                 'handleChange',
+                'loadProjectFromUrl',
                 'onload',
                 'removeFileObjects'
             ]);
             // tw: We have multiple instances of this HOC alive at a time. This flag fixes issues that arise from that.
             this.expectingFileUploadFinish = false;
+        }
+        componentDidMount () {
+            this.unregisterAndroidLoader = registerAndroidProjectLoader(
+                this.handleStartSelectingFileUpload,
+                this.loadProjectFromUrl
+            );
         }
         componentDidUpdate (prevProps) {
             if (this.props.isLoadingUpload && !prevProps.isLoadingUpload && this.expectingFileUploadFinish) {
@@ -56,12 +64,29 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             }
         }
         componentWillUnmount () {
+            this.unregisterAndroidLoader();
             this.removeFileObjects();
         }
         // step 1: this is where the upload process begins
         handleStartSelectingFileUpload () {
             this.expectingFileUploadFinish = true;
             this.createFileObjects(); // go to step 2
+        }
+        loadProjectFromUrl (url, filename) {
+            return readAndroidProject(url, filename)
+                .then(file => {
+                    this.removeFileObjects();
+                    this.expectingFileUploadFinish = true;
+                    this.fileReader = new FileReader();
+                    this.fileReader.onload = this.onload;
+                    this.fileToUpload = file;
+                    this.props.onSetFileHandle(null);
+                    this.props.requestProjectUpload(this.props.loadingState);
+                })
+                .catch(error => {
+                    log.error(error);
+                    this.props.onLoadingFailed(error);
+                });
         }
         // step 2: create a FileReader and an <input> element, and issue a
         // pseudo-click to it. That will open the file chooser dialog.
@@ -288,7 +313,8 @@ const SBFileUploaderHOC = function (WrappedComponent) {
         onSetFileHandle: PropTypes.func
     };
     SBFileUploaderComponent.defaultProps = {
-        showOpenFilePicker: typeof showOpenFilePicker === 'function' && !navigator.userAgent.includes('Android') ?
+        showOpenFilePicker: typeof showOpenFilePicker === 'function' &&
+            !window.AndroidProjectSaver && !navigator.userAgent.includes('Android') ?
             window.showOpenFilePicker.bind(window) :
             null
     };

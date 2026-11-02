@@ -1,6 +1,7 @@
 import ScratchStorage from '@turbowarp/scratch-storage';
 
 import defaultProject from './default-project';
+import getOfflineAssetURL from './offline-asset-url';
 
 /**
  * Wrapper for ScratchStorage which adds default web sources.
@@ -55,7 +56,8 @@ class Storage extends ScratchStorage {
         this.assetHost = assetHost;
     }
     getAssetGetConfig (asset) {
-        return `${this.assetHost}/internalapi/asset/${asset.assetId}.${asset.dataFormat}/get/`;
+        return getOfflineAssetURL(asset.assetId, asset.dataFormat) ||
+            `${this.assetHost}/internalapi/asset/${asset.assetId}.${asset.dataFormat}/get/`;
     }
     getAssetCreateConfig (asset) {
         return {

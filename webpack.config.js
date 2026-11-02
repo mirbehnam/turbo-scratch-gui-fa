@@ -233,7 +233,14 @@ module.exports = [
                 patterns: [
                     {
                         from: 'static',
-                        to: ''
+                        to: '',
+                        globOptions: {
+                            ignore: ['**/assets/**']
+                        }
+                    },
+                    {
+                        from: 'static/assets',
+                        to: 'static/assets'
                     }
                 ]
             }),

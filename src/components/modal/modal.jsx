@@ -22,6 +22,7 @@ const ModalComponent = props => (
         contentLabel={props.contentLabel}
         overlayClassName={styles.modalOverlay}
         onRequestClose={props.onRequestClose}
+        shouldCloseOnOverlayClick={props.shouldCloseOnOverlayClick}
     >
         <Box
             dir={props.isRtl ? 'rtl' : 'ltr'}
@@ -107,7 +108,8 @@ ModalComponent.propTypes = {
     headerImage: PropTypes.string,
     isRtl: PropTypes.bool,
     onHelp: PropTypes.func,
-    onRequestClose: PropTypes.func
+    onRequestClose: PropTypes.func,
+    shouldCloseOnOverlayClick: PropTypes.bool
 };
 
 export default ModalComponent;

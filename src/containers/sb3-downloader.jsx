@@ -86,10 +86,10 @@ class SB3Downloader extends React.Component {
             return;
         }
         this.startedSaving();
-        this.props.saveProjectSb3().then(content => {
-            this.finishedSaving();
-            downloadBlob(this.props.projectFilename, content);
-        });
+        this.props.saveProjectSb3()
+            .then(content => downloadBlob(this.props.projectFilename, content))
+            .then(() => this.finishedSaving())
+            .catch(error => this.handleSaveError(error));
     }
     async saveAsNew () {
         if (!this.props.canSaveProject) {
@@ -295,7 +295,8 @@ SB3Downloader.propTypes = {
 };
 SB3Downloader.defaultProps = {
     className: '',
-    showSaveFilePicker: typeof showSaveFilePicker === 'function' && !navigator.userAgent.includes('Android') ?
+    showSaveFilePicker: typeof showSaveFilePicker === 'function' &&
+        !window.AndroidProjectSaver && !navigator.userAgent.includes('Android') ?
         window.showSaveFilePicker.bind(window) :
         null
 };

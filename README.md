@@ -1,5 +1,8 @@
 scratch-gui modified for use in [TurboWarp](https://turbowarp.org/)
 
+Android host bridge and Windows build instructions: [ANDROID_BRIDGE.md](ANDROID_BRIDGE.md).
+All `my-develop` customizations and offline media contracts: [MY_DEVELOP_CHANGES.md](MY_DEVELOP_CHANGES.md).
+
 ## Setup
 
 See https://docs.turbowarp.org/development/getting-started to setup the complete TurboWarp environment.

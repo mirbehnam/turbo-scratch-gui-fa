@@ -1,4 +1,9 @@
+import {saveAndroidBlob} from './android-bridge';
+
 export default (filename, blob) => {
+    const nativeTransfer = saveAndroidBlob(filename, blob);
+    if (nativeTransfer) return nativeTransfer;
+
     const downloadLink = document.createElement('a');
     document.body.appendChild(downloadLink);
 
