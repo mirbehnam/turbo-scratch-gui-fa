@@ -3,9 +3,11 @@ import {spawnSync} from 'node:child_process';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {verifyOfflineAssets} from './verify-offline-assets.mjs';
+import {verifyTutorialRemoval} from './verify-tutorial-removal.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 await verifyOfflineAssets(root, path.join(root, 'static', 'assets'));
+await verifyTutorialRemoval(root);
 const result = spawnSync(process.execPath, [process.env.npm_execpath, 'run', 'build'], {
     cwd: root,
     stdio: 'inherit',
@@ -31,3 +33,4 @@ for (const contract of ['AndroidScratchLoadProjectUrl', 'AndroidScratchLoadProje
 }
 console.log(`Android editor build verified: ${files.length} files in ${path.join(root, 'build')}`);
 console.log(`Offline media verified: ${await verifyOfflineAssets(root)} files with original content hashes.`);
+console.log(`Tutorial removal verified: ${await verifyTutorialRemoval(root, path.join(root, 'build'))} files absent.`);

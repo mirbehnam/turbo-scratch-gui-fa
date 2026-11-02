@@ -9,7 +9,8 @@ This repository is separate from the adjacent scratch-editor-fa checkout. Do not
 modify that repository as part of work here. Keep all customizations on
 `my-develop`; `develop` must stay identical to the original fork's `origin/develop`.
 Android bridge compatibility, Android/Windows packaging, and offline media
-libraries were requested for this fork. Do not silently port other customizations
+libraries and complete removal of internal tutorials were requested for this fork.
+Do not silently port other customizations
 or change VM implementations.
 
 All sprite/costume/backdrop/sound library assets and thumbnails must use the local
@@ -20,6 +21,14 @@ After changing catalogs, run `npm run assets:download`, commit the updated
 run `npm run build:verify-offline`. The verifier checks completeness and original
 MD5 content hashes. Keep unrelated online services and unbundled project/custom
 font fallbacks distinct from the offline media-library guarantee.
+
+Internal tutorials are intentionally removed from source and every GUI build.
+Read [docs/TUTORIAL_REMOVAL.md](docs/TUTORIAL_REMOVAL.md) before an upstream merge.
+Do not restore cards, decks, tips-library state/actions or tutorial URL handling.
+The 1500 audited deletions and original SHA256 hashes are recorded in
+`scripts/tutorial-removal-audit.json`; `build:verify-offline` also verifies source
+removal and rejects removed images in the build. Preserve shared UI assets,
+addons, extension help, and all media libraries.
 
 Use Node.js 24 and the committed package-lock.json. Run `npm run test:unit` and
 lint affected source files. `npm run build:android` builds the editor and both

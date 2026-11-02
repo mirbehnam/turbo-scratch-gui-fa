@@ -14,7 +14,7 @@
     "assets:download": "node scripts/download-assets.mjs",
     "build": "npm run clean && webpack --colors --bail",
     "build:android": "node scripts/build-android.mjs && npm run build:windows",
-    "build:verify-offline": "node scripts/verify-offline-assets.mjs",
+    "build:verify-offline": "node scripts/verify-offline-assets.mjs && node scripts/verify-tutorial-removal.mjs",
     "build:windows": "node scripts/build-windows.mjs",
     "clean": "rimraf ./build && mkdirp build && rimraf ./dist && mkdirp dist",
     "deploy": "touch build/.nojekyll && gh-pages -t -d build -m \"[skip ci] Build for $(git log --pretty=format:%H -n1)\"",

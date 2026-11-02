@@ -152,14 +152,6 @@
     height: 1rem;
 }
 
-.help-icon {
-    margin: 0 .25rem 0 0;
-}
-
-[dir="rtl"] .help-icon {
-    margin: 0 0 0 .25rem;
-}
-
 .account-nav-menu, .mystuff-button {
     padding: 0 .25rem;
     display: flex;
@@ -220,13 +212,10 @@
 }
 
 @media only screen and (max-width: 1124px) {
-    .tutorials-label, .collapsible-label {
+    .collapsible-label {
         display: none;
     }
 
-    .help-icon {
-        margin-right: 0;
-    }
 }
 
 .menu-item-link {

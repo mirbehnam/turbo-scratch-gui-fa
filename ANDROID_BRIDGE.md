@@ -11,7 +11,9 @@ were adapted from that project. All customizations are documented in
 [MY_DEVELOP_CHANGES.md](MY_DEVELOP_CHANGES.md). `develop` remains on the original
 fork's commit and must not receive these changes.
 The VM, compiler, translations, branding inside the editor,
-addons, tutorials, and media catalogs retain TurboWarp's behavior.
+addons, and media catalogs retain TurboWarp's behavior. The internal tutorial
+system and its dedicated source assets have been removed; see
+[docs/TUTORIAL_REMOVAL.md](docs/TUTORIAL_REMOVAL.md) for the complete audited list.
 No native Android client source or client assets were changed.
 
 The complete sprite/costume/backdrop/sound catalog is bundled locally: 1304 files,
@@ -89,6 +91,7 @@ checked against their content-addressed MD5 names.
 3. Verifies the generated Android bridge contracts.
    It also verifies all offline media before and after compilation and rejects
    missing files or incorrect content hashes.
+   Removed tutorial source files and tutorial image hashes are checked as well.
 4. Packages that same `build/` into Windows x64 and ia32 Electron applications and
    compiles the two Inno Setup installers.
 
@@ -127,9 +130,13 @@ renderer and context isolation/sandboxing remain enabled.
 
 Initial validation completed on Windows:
 
-- `npm run test:unit`: 46 tests passed, including 8 Android bridge tests and
-  5 offline asset tests.
-- ESLint on all changed editor JavaScript/JSX files: no errors or warnings.
+- `npm run test:unit`: 50 tests passed, including 8 Android bridge tests,
+  5 offline asset tests and 4 tutorial-removal tests.
+- Initial bridge/offline editor changes passed targeted ESLint without errors or warnings.
+  For tutorial removal, the other changed files pass; `menu-bar.jsx` retains
+  22 pre-existing lint errors. `i18n:src` is also blocked by the pre-existing
+  duplicate `gui.menuBar.downloadToComputer` definitions; details are recorded
+  in `MY_DEVELOP_CHANGES.md`.
 - `npm run build:android`: production build and both Inno installers succeeded.
 - Browser integration with the actual client text-input injection script and
   mocked native interfaces: native SB3 save, project URL reload exactly once,
@@ -143,7 +150,7 @@ Initial validation completed on Windows:
   accessible; shared and TurboWarp-specific sprites, costumes, backdrops, sound
   previews and sound selection work; SB3 save/reload works; no Scratch asset CDN
   requests or missing files.
-- The complete web build has 1709 files (76.57 MiB), no source maps. SHA256 of
+- The complete web build has 1707 files (76.43 MiB), no source maps. SHA256 of
   every web file in both Windows packages matches the Android build.
 
 The browser integration test simulates the native interface; it does not replace
