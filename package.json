@@ -20,6 +20,7 @@
     "deploy": "touch build/.nojekyll && gh-pages -t -d build -m \"[skip ci] Build for $(git log --pretty=format:%H -n1)\"",
     "i18n:push": "tx-push-src scratch-editor interface translations/en.json",
     "i18n:src": "rimraf ./translations/messages/src && babel src > tmp.js && rimraf tmp.js && build-i18n-src ./translations/messages/src ./translations/",
+    "locales:prune": "node scripts/prune-locales.mjs",
     "prepublish": "node scripts/prepublish.mjs",
     "prune": "./prune-gh-pages.sh",
     "start": "webpack-dev-server",

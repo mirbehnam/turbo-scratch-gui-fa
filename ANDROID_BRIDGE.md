@@ -10,8 +10,11 @@ The existing Android host bridge contracts and offline media-library behavior
 were adapted from that project. All customizations are documented in
 [MY_DEVELOP_CHANGES.md](MY_DEVELOP_CHANGES.md). `develop` remains on the original
 fork's commit and must not receive these changes.
-The VM, compiler, translations, branding inside the editor,
-addons, and media catalogs retain TurboWarp's behavior. The internal tutorial
+The VM, compiler, branding inside the editor, addon functionality, and media
+catalogs retain TurboWarp's behavior. The initial sprite is the Scratch cat,
+the default language is Persian RTL, and only Arabic/English/Persian are enabled
+through a standalone language dialog. See [docs/PERSIAN_CUSTOMIZATIONS.md](docs/PERSIAN_CUSTOMIZATIONS.md).
+The internal tutorial
 system and its dedicated source assets have been removed; see
 [docs/TUTORIAL_REMOVAL.md](docs/TUTORIAL_REMOVAL.md) for the complete audited list.
 No native Android client source or client assets were changed.
@@ -60,6 +63,13 @@ clicks do not close them while the native bridge is present. Native confirmation
 only updates/blurs the input: the user still presses the Scratch dialog's OK to
 create a broadcast/variable/list. Browser-only dialogs keep their previous focus
 and background-click behavior.
+
+The editor configures its native Android viewport in the HTML head, before the
+first layout: `width=1024, user-scalable=no`. Exact Android asset-origin detection
+or either native bridge enables this even with a Windows User-Agent. The existing
+host's wide-viewport/overview settings can scale the entire editor width. Normal
+desktop/Electron and non-editor pages keep their upstream viewport. Vertical
+scrolling and the editor's natural minimum height are unchanged.
 
 ## Build commands
 
@@ -130,8 +140,8 @@ renderer and context isolation/sandboxing remain enabled.
 
 Initial validation completed on Windows:
 
-- `npm run test:unit`: 50 tests passed, including 8 Android bridge tests,
-  5 offline asset tests and 4 tutorial-removal tests.
+- `npm run test:unit`: 64 tests passed, including bridge, offline media,
+  tutorial removal, Android viewport, default cat/Persian and three-language bundle tests.
 - Initial bridge/offline editor changes passed targeted ESLint without errors or warnings.
   For tutorial removal, the other changed files pass; `menu-bar.jsx` retains
   22 pre-existing lint errors. `i18n:src` is also blocked by the pre-existing
@@ -150,7 +160,7 @@ Initial validation completed on Windows:
   accessible; shared and TurboWarp-specific sprites, costumes, backdrops, sound
   previews and sound selection work; SB3 save/reload works; no Scratch asset CDN
   requests or missing files.
-- The complete web build has 1707 files (76.43 MiB), no source maps. SHA256 of
+- The complete web build has 1690 files (70.95 MiB), no source maps. SHA256 of
   every web file in both Windows packages matches the Android build.
 
 The browser integration test simulates the native interface; it does not replace

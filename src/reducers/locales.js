@@ -1,28 +1,32 @@
 import {addLocaleData} from 'react-intl';
 
-import {localeData, isRtl} from '@turbowarp/scratch-l10n';
-import editorMessages from '@turbowarp/scratch-l10n/locales/editor-msgs';
+import locales, {localeData, isRtl, pickSupportedMessages, messageOverrides} from '../lib/supported-locales';
+import allEditorMessages from '@turbowarp/scratch-l10n/locales/editor-msgs';
 import addAdditionalTranslations from '../lib/tw-translations/index.js';
 
 import {LANGUAGE_KEY} from '../lib/detect-locale.js';
 
+const editorMessages = pickSupportedMessages(allEditorMessages);
 addAdditionalTranslations(editorMessages);
+Object.keys(editorMessages).forEach(locale => Object.assign(editorMessages[locale], messageOverrides[locale]));
 addLocaleData(localeData);
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';
 const SELECT_LOCALE = 'scratch-gui/locales/SELECT_LOCALE';
 
 const initialState = {
-    isRtl: false,
-    locale: 'en',
+    isRtl: true,
+    locale: 'fa',
     messagesByLocale: editorMessages,
-    messages: editorMessages.en
+    messages: editorMessages.fa
 };
 
 const reducer = function (state, action) {
     if (typeof state === 'undefined') state = initialState;
     switch (action.type) {
     case SELECT_LOCALE:
+        if (!Object.prototype.hasOwnProperty.call(locales, action.locale) ||
+            !Object.prototype.hasOwnProperty.call(state.messagesByLocale, action.locale)) return state;
         return Object.assign({}, state, {
             isRtl: isRtl(action.locale),
             locale: action.locale,
@@ -33,8 +37,8 @@ const reducer = function (state, action) {
         return Object.assign({}, state, {
             isRtl: state.isRtl,
             locale: state.locale,
-            messagesByLocale: action.messagesByLocale,
-            messages: action.messagesByLocale[state.locale]
+            messagesByLocale: {...state.messagesByLocale, ...pickSupportedMessages(action.messagesByLocale)},
+            messages: action.messagesByLocale[state.locale] || state.messages
         });
     default:
         return state;
@@ -44,7 +48,7 @@ const reducer = function (state, action) {
 const selectLocale = function (locale) {
     // tw: store language in localStorage
     try {
-        localStorage.setItem(LANGUAGE_KEY, locale);
+        if (Object.prototype.hasOwnProperty.call(locales, locale)) localStorage.setItem(LANGUAGE_KEY, locale);
     } catch (e) { /* ignore */ }
     return {
         type: SELECT_LOCALE,
@@ -59,7 +63,8 @@ const setLocales = function (localesMessages) {
     };
 };
 const initLocale = function (currentState, locale) {
-    if (Object.prototype.hasOwnProperty.call(currentState.messagesByLocale, locale)) {
+    if (Object.prototype.hasOwnProperty.call(locales, locale) &&
+        Object.prototype.hasOwnProperty.call(currentState.messagesByLocale, locale)) {
         return Object.assign(
             {},
             currentState,

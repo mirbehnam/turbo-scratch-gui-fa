@@ -25,7 +25,7 @@
         but fixes [FFx + Safari] [resize window down + scroll to the right] bug.
         width: 100%;
     */
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "BYekan", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: $menu-bar-standard-font-size;
     font-weight: bold;
     background-color: $menu-bar-background;
@@ -98,17 +98,6 @@
 .menu-bar-menu {
     margin-top: $menu-bar-height;
     z-index: $z-index-menu-bar;
-}
-
-.feedback-link {
-    color: $menu-bar-background;
-    text-decoration: none;
-}
-
-.feedback-button {
-    background-color: white;
-    color: inherit;
-    height: 34px;
 }
 
 .divider {

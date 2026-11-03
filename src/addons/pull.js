@@ -24,6 +24,7 @@ const childProcess = require('child_process');
 const rimraf = require('rimraf');
 const pathUtil = require('path');
 const {addons, newAddons} = require('./addons.js');
+const supportedLocaleCodes = require('../lib/supported-locale-codes.json');
 
 const walk = dir => {
     const children = fs.readdirSync(dir);
@@ -487,16 +488,18 @@ for (const file of l10nFiles) {
     }
     // Convert pt-br to just pt
     const fixedName = file === 'pt-br' ? 'pt' : file;
-    languages.push(fixedName);
     const runtimePath = pathUtil.resolve(__dirname, 'addons-l10n', `${fixedName}.json`);
     const settingsPath = pathUtil.resolve(__dirname, 'addons-l10n-settings', `${fixedName}.json`);
     const {settings, runtime, upstreamMessageIds} = parseMessageDirectory(oldDirectory);
     for (const id of upstreamMessageIds) {
         allUpstreamMessageIds.add(id);
     }
-    fs.writeFileSync(runtimePath, JSON.stringify(runtime, null, 4));
-    if (fixedName !== 'en') {
-        fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
+    if (supportedLocaleCodes.includes(fixedName)) {
+        languages.push(fixedName);
+        fs.writeFileSync(runtimePath, JSON.stringify(runtime, null, 4));
+        if (fixedName !== 'en') {
+            fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 4));
+        }
     }
 }
 

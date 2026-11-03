@@ -6,6 +6,11 @@ let messages = defineMessages({
         defaultMessage: 'my variable',
         description: 'Name for the default variable',
         id: 'gui.defaultProject.variable'
+    },
+    meow: {
+        defaultMessage: 'Meow',
+        description: 'Name of the default cat sound',
+        id: 'gui.defaultProject.meow'
     }
 });
 
@@ -60,16 +65,33 @@ const projectData = translateFunction => {
                 currentCostume: 0,
                 costumes: [
                     {
-                        assetId: '927d672925e7b99f7813735c484c6922',
+                        assetId: 'bcf454acf82e4504149f7ffe07081dbc',
                         name: translator(messages.costume, {index: 1}),
                         bitmapResolution: 1,
-                        md5ext: '927d672925e7b99f7813735c484c6922.svg',
+                        md5ext: 'bcf454acf82e4504149f7ffe07081dbc.svg',
                         dataFormat: 'svg',
-                        rotationCenterX: 30.74937882782359,
-                        rotationCenterY: 58.864768144346826
+                        rotationCenterX: 48,
+                        rotationCenterY: 50
+                    },
+                    {
+                        assetId: '0fb9be3e8397c983338cb71dc84d0b25',
+                        name: translator(messages.costume, {index: 2}),
+                        bitmapResolution: 1,
+                        md5ext: '0fb9be3e8397c983338cb71dc84d0b25.svg',
+                        dataFormat: 'svg',
+                        rotationCenterX: 46,
+                        rotationCenterY: 53
                     }
                 ],
-                sounds: [],
+                sounds: [{
+                    assetId: '83c36d806dc92327b9e7049a565c6bff',
+                    name: translator(messages.meow),
+                    dataFormat: 'wav',
+                    format: '',
+                    rate: 22050,
+                    sampleCount: 18688,
+                    md5ext: '83c36d806dc92327b9e7049a565c6bff.wav'
+                }],
                 volume: 100,
                 visible: true,
                 x: 0,

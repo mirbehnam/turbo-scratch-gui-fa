@@ -13,6 +13,18 @@ libraries and complete removal of internal tutorials were requested for this for
 Do not silently port other customizations
 or change VM implementations.
 
+The initial sprite is the Scratch cat (two costumes and Meow), not Dango. Fresh
+installs default to Persian RTL; preserve an explicit supported user choice.
+Only `ar`, `en`, `fa` are interface languages. Keep the standalone language button
+and three-language dialog outside Settings, and do not restore the Feedback button.
+Read `docs/PERSIAN_CUSTOMIZATIONS.md` for the locale loaders and source pruning.
+Keep the bundled BYekan font on editor controls, block text and the TurboWarp
+toolbox's `.scratchCategoryMenuItemLabel`. Do not change fonts inside user costumes.
+The app entry point disables the See Project Page button; preserve player/fullscreen
+functionality and the public GUI component's optional community interface.
+After updating generated addon/TurboWarp translations, run `npm run locales:prune`.
+Do not modify installed dependencies to enforce language restrictions.
+
 All sprite/costume/backdrop/sound library assets and thumbnails must use the local
 `static/assets` files. Do not restore CDN URLs for bundled media or introduce
 per-thumbnail Blob conversion. Preserve the original library names and content.
@@ -34,3 +46,8 @@ Use Node.js 24 and the committed package-lock.json. Run `npm run test:unit` and
 lint affected source files. `npm run build:android` builds the editor and both
 Windows installers; `npm run build:windows` only repackages the existing build.
 Keep Windows app/installer identities separate from Scratch farsi.
+
+The editor HTML configures `width=1024, user-scalable=no` before its first layout
+only for the exact Android asset origin or a native Android bridge. Preserve the
+ordinary desktop/Electron viewport and do not rely on the host's Windows UA to
+detect Android. Keep this initialization before the editor bundles load.

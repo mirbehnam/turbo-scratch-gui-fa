@@ -3,6 +3,18 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <% if (htmlWebpackPlugin.options.isEditor) { %>
+    <script id="android-editor-viewport">
+      (function () {
+        var nativeAndroid = window.location.origin === 'https://appassets.androidplatform.net' ||
+          window.AndroidProjectSaver || window.AndroidScratchTextInput;
+        if (nativeAndroid) {
+          // Let the host fit the desktop-width editor before the first layout.
+          document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=1024, user-scalable=no');
+        }
+      }());
+    </script>
+    <% } %>
     <meta name="google" value="notranslate">
     <meta name="description" content="<%= htmlWebpackPlugin.options.APP_NAME %> is a Scratch mod with a compiler to run projects faster, dark mode for your eyes, a bunch of addons to improve the editor, and more." />
     <title><%= htmlWebpackPlugin.options.title %></title>

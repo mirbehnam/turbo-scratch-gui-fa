@@ -65,12 +65,23 @@ const base = {
     resolve: {
         symlinks: false,
         alias: {
+            'scratch-gui-fonts': path.resolve(__dirname, 'src/css/fonts'),
+            '@turbowarp/scratch-l10n$': path.resolve(__dirname, 'src/lib/supported-locales'),
+            'scratch-l10n$': path.resolve(__dirname, 'src/lib/supported-locales'),
             'text-encoding$': path.resolve(__dirname, 'src/lib/tw-text-encoder'),
             'scratch-render-fonts$': path.resolve(__dirname, 'src/lib/tw-scratch-render-fonts')
         }
     },
     module: {
         rules: [{
+            test: /[\\/]scratch-blocks[\\/]msg[\\/]scratch_msgs\.js$/,
+            enforce: 'pre',
+            loader: path.resolve(__dirname, 'scripts/loaders/blocks-locales.cjs')
+        }, {
+            test: /[\\/]scratch-l10n[\\/]locales[\\/](editor|blocks|extensions|interface|paint-editor)-msgs\.js$/,
+            enforce: 'pre',
+            loader: path.resolve(__dirname, 'scripts/loaders/supported-locales.cjs')
+        }, {
             test: /\.jsx?$/,
             loader: 'babel-loader',
             include: [
