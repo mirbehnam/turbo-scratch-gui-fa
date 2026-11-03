@@ -1,5 +1,6 @@
 node_modules/*
 build/*
+build-windows/*
 dist/*
 test/*
 src/examples/*
@@ -9,3 +10,4 @@ src/addons/addons
 src/addons/libraries
 src/addons/api-libraries
 src/addons/generated
+vendor/packager

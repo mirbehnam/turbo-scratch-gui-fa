@@ -1,0 +1,22 @@
+@import "../../css/colors.css";
+.modal-content {
+    width: 1000px;
+    max-width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    max-height: calc(100% - 16px);
+    margin: 8px auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+.modal-content > div { display: flex; flex-direction: column; min-height: 0; }
+.modal-content > div > div:first-child { flex-shrink: 0; }
+.body { flex: 1; min-height: 0; display: flex; flex-direction: column; background: $ui-modal-background; }
+.frame { flex: 1; width: 100%; min-height: 0; border: none; }
+.hidden { display: none; }
+.result { margin: auto; padding: 1rem; max-width: 36rem; text-align: center; overflow-y: auto; }
+.filename { overflow-wrap: anywhere; user-select: text; }
+.actions { display: flex; justify-content: center; gap: 0.75rem; margin: 1rem 0; }
+.button { padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: 1px solid $ui-black-transparent; background: $looks-secondary; color: white; cursor: pointer; }
+.button:disabled { opacity: 0.5; cursor: wait; }
+.error { color: #c22727; }

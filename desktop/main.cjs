@@ -1,4 +1,6 @@
-const {app, BrowserWindow, dialog, session, shell} = require('electron');
+const {app, BrowserWindow, dialog, ipcMain, session, shell} = require('electron');
+const {createPackagerExporter} = require('./packager-export.cjs');
+const {shareFile, stopShareHelpers} = require('./share-file.cjs');
 const {createCloseHandler} = require('./window-config.cjs');
 const http = require('node:http');
 const fs = require('node:fs/promises');
@@ -71,9 +73,25 @@ const createWindow = () => {
         show: false,
         title,
         icon: path.join(__dirname, 'icon.png'),
-        webPreferences: {contextIsolation: true, nodeIntegration: false, sandbox: true}
+        webPreferences: {contextIsolation: true, nodeIntegration: false, sandbox: true,
+            preload: path.join(__dirname, 'preload.cjs')}
     });
     window.setMenuBarVisibility(false);
+    const exporter = createPackagerExporter({downloads: app.getPath('downloads'),
+        cache: path.join(app.getPath('temp'), 'TurboWarpFA-packager'), shareFile});
+    ipcMain.handle('packager-export', async (event, message) => {
+        if (event.sender !== window.webContents || event.senderFrame !== window.webContents.mainFrame ||
+            new URL(event.senderFrame.url).origin !== origin ||
+            !['/index.html', '/editor.html'].includes(new URL(event.senderFrame.url).pathname)) {
+            throw new Error('Untrusted export sender');
+        }
+        return exporter.request(message);
+    });
+    window.on('closed', () => {
+        stopShareHelpers();
+        ipcMain.removeHandler('packager-export');
+        exporter.dispose().catch(error => console.error('Packager export cleanup failed:', error));
+    });
     window.on('close', createCloseHandler({app, dialog, mainWindow: window, logger: console}));
     window.once('ready-to-show', () => window.show());
     window.webContents.on('page-title-updated', event => {

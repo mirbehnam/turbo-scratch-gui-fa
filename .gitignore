@@ -3,6 +3,7 @@
 
 # NPM
 /node_modules
+/vendor/packager/node_modules
 npm-*
 
 # Testing

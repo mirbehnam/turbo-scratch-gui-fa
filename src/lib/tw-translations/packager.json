@@ -1,0 +1,32 @@
+{
+  "fa": {
+    "tw.menuBar.package": "ساخت خروجی پروژه",
+    "tw.packager.title": "ساخت خروجی پروژه",
+    "tw.packager.preparing": "در حال ذخیرهٔ نسخهٔ موقت پروژهٔ فعلی…",
+    "tw.packager.ready": "فایل HTML آماده است",
+    "tw.packager.save": "ذخیره",
+    "tw.packager.share": "اشتراک‌گذاری",
+    "tw.packager.working": "لطفاً صبر کنید…",
+    "tw.packager.saved": "در پوشهٔ دانلود ذخیره شد: {name}",
+    "tw.packager.downloading": "درخواست دانلود آغاز شد: {name}",
+    "tw.packager.shared": "پنجرهٔ اشتراک‌گذاری باز شد.",
+    "tw.packager.explanation": "این فایل HTML برای اجرای پروژه است و مستقیماً در ویرایشگر اسکرچ باز نمی‌شود. نسخهٔ SB3 را برای ویرایش نگه دارید.",
+    "tw.packager.engine": "با موتور بهینهٔ TurboWarp اجرا می‌شود. سرعت و کیفیت تصویر به پروژه، دستگاه و تنظیمات انتخاب‌شده بستگی دارد.",
+    "tw.packager.failed": "عملیات انجام نشد. پروژهٔ شما تغییر نکرده است؛ دوباره تلاش کنید."
+  },
+  "ar": {
+    "tw.menuBar.package": "إنشاء ملف المشروع",
+    "tw.packager.title": "إنشاء ملف المشروع",
+    "tw.packager.preparing": "جارٍ حفظ نسخة مؤقتة من المشروع الحالي…",
+    "tw.packager.ready": "ملف HTML جاهز",
+    "tw.packager.save": "حفظ",
+    "tw.packager.share": "مشاركة",
+    "tw.packager.working": "يرجى الانتظار…",
+    "tw.packager.saved": "تم الحفظ في مجلد التنزيلات: {name}",
+    "tw.packager.downloading": "بدأ طلب التنزيل: {name}",
+    "tw.packager.shared": "تم فتح نافذة المشاركة.",
+    "tw.packager.explanation": "هذا ملف HTML لتشغيل المشروع ولا يمكن فتحه مباشرةً في محرر سكراتش. احتفظ بمشروع SB3 للتحرير.",
+    "tw.packager.engine": "يعمل بمحرك TurboWarp المحسّن. تعتمد السرعة وجودة الصورة على المشروع والجهاز والإعدادات المحددة.",
+    "tw.packager.failed": "تعذرت العملية. لم يتغير مشروعك؛ حاول مرة أخرى."
+  }
+}

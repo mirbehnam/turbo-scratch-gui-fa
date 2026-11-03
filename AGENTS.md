@@ -1,5 +1,12 @@
 # Agent guide for this TurboWarp fork
 
+The File menu packager is an embedded HTML-only tool, not an external website.
+Read [docs/EMBEDDED_PACKAGER.md](docs/EMBEDDED_PACKAGER.md) before changing its
+iframe protocol, pinned vendor sources, local scaffolding or native export bridges.
+Preserve automatic current-project import, fa/ar/en, no intro/project chooser,
+Downloads save, native sharing and the main-frame/origin restrictions. Every build
+must include `build/packager`; `build:android` also packages it in both Windows builds.
+
 Before changing Android input/loading/saving or build/desktop packaging, read
 [ANDROID_BRIDGE.md](ANDROID_BRIDGE.md) and [MY_DEVELOP_CHANGES.md](MY_DEVELOP_CHANGES.md).
 Preserve the host method names and the
