@@ -5,6 +5,7 @@ import Modal from '../modal/modal.jsx';
 import {createPackagerSnapshot, clearPackagerSnapshot} from '../../lib/packager-snapshot.js';
 import {exportPackagedFile, isPackagerMessage} from '../../lib/packager-export.js';
 import styles from './packager-modal.css';
+import PackagerPlayer from './packager-player.jsx';
 
 const messages = defineMessages({
     title: {id: 'tw.packager.title', defaultMessage: 'Package project'},
@@ -12,14 +13,15 @@ const messages = defineMessages({
     ready: {id: 'tw.packager.ready', defaultMessage: 'HTML file is ready'},
     save: {id: 'tw.packager.save', defaultMessage: 'Save'},
     share: {id: 'tw.packager.share', defaultMessage: 'Share'},
+    run: {id: 'tw.packager.run', defaultMessage: 'Run directly'},
     working: {id: 'tw.packager.working', defaultMessage: 'Please wait…'},
     saved: {id: 'tw.packager.saved', defaultMessage: 'Saved to Downloads: {name}'},
     downloading: {id: 'tw.packager.downloading', defaultMessage: 'Download requested: {name}'},
     shared: {id: 'tw.packager.shared', defaultMessage: 'The sharing window was opened.'},
     // eslint-disable-next-line max-len
-    explanation: {id: 'tw.packager.explanation', defaultMessage: 'This is an HTML file for running your project. It cannot be opened directly in the Scratch editor. Keep the SB3 project for editing.'},
+    explanation: {id: 'tw.packager.explanation', defaultMessage: 'When you export as html, your game runs much more smoothly and faster 😍 and you can easily share it with your friends.'},
     // eslint-disable-next-line max-len
-    engine: {id: 'tw.packager.engine', defaultMessage: 'Runs with the optimized TurboWarp engine. Speed and visual quality depend on the project, device and selected settings.'},
+    engine: {id: 'tw.packager.engine', defaultMessage: 'Please note that html files can no longer be edited in Scratch and are only suitable for running.'},
     // eslint-disable-next-line max-len
     failed: {id: 'tw.packager.failed', defaultMessage: 'The operation could not be completed. Your project has not been changed; please try again.'}
 });
@@ -33,6 +35,7 @@ const PackagerModal = ({intl, vm, title, theme, onClose}) => {
     const [busy, setBusy] = useState(false);
     const [status, setStatus] = useState('');
     const [error, setError] = useState(false);
+    const [playing, setPlaying] = useState(false);
     const format = (message, values) => intl.formatMessage(message, values);
     const configure = () => {
         if (frame.current) {
@@ -111,54 +114,87 @@ const PackagerModal = ({intl, vm, title, theme, onClose}) => {
     };
     const save = useCallback(() => perform('save'), [result, intl.locale]);
     const share = useCallback(() => perform('share'), [result, intl.locale]);
+    const play = useCallback(async () => {
+        if (!window.AndroidProjectSaver && !window.AndroidPackagedExport) {
+            setPlaying(true);
+            return;
+        }
+        setBusy(true);
+        setError(false);
+        try {
+            await exportPackagedFile(result.blob, result.name, 'preview', intl.locale, {dark: theme.isDark()});
+        } catch (err) {
+            console.error('Packager Android direct play failed:', err);
+            setError(true);
+        } finally {
+            setBusy(false);
+        }
+    }, [result, intl.locale, theme]);
+    const closePlayer = useCallback(() => setPlaying(false), []);
     const params = new URLSearchParams({import_from: location.origin,
         locale: intl.locale,
         theme: theme.isDark() ? 'dark' : 'light'});
     const source = useRef(new URL(`packager/index.html?${params}`, document.baseURI).href);
     return (
         <Modal
-            className={styles.modalContent}
+            className={playing ? styles.playerModal : styles.modalContent}
+            headerClassName={playing ? styles.hidden : null}
+            fullScreen={playing}
             contentLabel={format(result ? messages.ready : messages.title)}
-            onRequestClose={onClose}
+            onRequestClose={playing ? closePlayer : onClose}
             shouldCloseOnOverlayClick={false}
             isRtl={intl.locale !== 'en'}
             id="embeddedPackager"
         >
             <div className={styles.body}>
-                {!prepared && <p className={styles.result}>{format(messages.preparing)}</p>}
-                {prepared && <iframe
-                    ref={frame}
-                    title={format(messages.title)}
-                    src={source.current}
-                    className={result ? styles.hidden : styles.frame}
+                {playing && <PackagerPlayer
+                    blob={result.blob}
+                    name={result.name}
+                    onClose={closePlayer}
                 />}
-                {result && <div className={styles.result}>
-                    <p className={styles.filename}>{result.name}</p>
-                    <div className={styles.actions}>
-                        <button
-                            className={styles.button}
-                            disabled={busy}
-                            onClick={save}
-                        >
-                            {format(messages.save)}
-                        </button>
-                        <button
-                            className={styles.button}
-                            disabled={busy}
-                            onClick={share}
-                        >
-                            {format(messages.share)}
-                        </button>
-                    </div>
-                    <p>{format(messages.explanation)}</p>
-                    <p>{format(messages.engine)}</p>
-                    {busy && <p role="status">{format(messages.working)}</p>}
-                    {status && <p role="status">{status}</p>}
-                </div>}
-                {error && <p
-                    className={styles.error}
-                    role="alert"
-                >{format(messages.failed)}</p>}
+                <div className={playing ? styles.hidden : styles.workspace}>
+                    {!prepared && <p className={styles.result}>{format(messages.preparing)}</p>}
+                    {prepared && <iframe
+                        ref={frame}
+                        title={format(messages.title)}
+                        src={source.current}
+                        className={result ? styles.hidden : styles.frame}
+                    />}
+                    {result && <div className={styles.result}>
+                        <p className={styles.filename}>{result.name}</p>
+                        <div className={styles.actions}>
+                            <button
+                                className={styles.button}
+                                disabled={busy}
+                                onClick={play}
+                            >
+                                {format(messages.run)}
+                            </button>
+                            <button
+                                className={styles.button}
+                                disabled={busy}
+                                onClick={save}
+                            >
+                                {format(messages.save)}
+                            </button>
+                            <button
+                                className={styles.button}
+                                disabled={busy}
+                                onClick={share}
+                            >
+                                {format(messages.share)}
+                            </button>
+                        </div>
+                        <p>{format(messages.explanation)}</p>
+                        <p>{format(messages.engine)}</p>
+                        {busy && <p role="status">{format(messages.working)}</p>}
+                        {status && <p role="status">{status}</p>}
+                    </div>}
+                    {error && <p
+                        className={styles.error}
+                        role="alert"
+                    >{format(messages.failed)}</p>}
+                </div>
             </div>
         </Modal>
     );

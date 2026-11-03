@@ -52,7 +52,7 @@ const base64 = async blob => {
 
 export const hasNativePackagerExport = () => Boolean(window.desktopPackager || window.AndroidPackagedExport);
 
-export const exportPackagedFile = async (blob, name, action, locale) => {
+export const exportPackagedFile = async (blob, name, action, locale, configuration = {}) => {
     const extension = blob.type === 'application/json' ? 'json' : 'html';
     const filename = sanitizeExportName(name, extension);
     if (!hasNativePackagerExport()) {
@@ -76,7 +76,7 @@ export const exportPackagedFile = async (blob, name, action, locale) => {
         for (let offset = 0; offset < blob.size; offset += 196608) {
             await request({op: 'append', transfer, data: await base64(blob.slice(offset, offset + 196608))});
         }
-        return await request({op: action, transfer, locale});
+        return await request({...configuration, op: action, transfer, locale});
     } catch (error) {
         await request({op: 'cancel', transfer}).catch(cancelError => {
             console.warn('Packager export cancel failed:', transfer, cancelError);

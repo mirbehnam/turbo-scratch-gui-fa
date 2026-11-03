@@ -9,11 +9,9 @@
   import ImageInput from './ImageInput.svelte';
   import LearnMore from './LearnMore.svelte';
   import ColorPicker from './ColorPicker.svelte';
-  import Downloads from './Downloads.svelte';
   import writablePersistentStore from './persistent-store';
   import fileStore from './file-store';
   import {progress, currentTask, error} from './stores';
-  import Preview from './preview';
   import deepClone from './deep-clone';
   import Packager from '../packager/web/export';
   import Task from './task';
@@ -22,6 +20,8 @@
   import {readAsText} from '../common/readers';
   import merge from './merge';
   import DropArea from './DropArea.svelte';
+  import {createQualityPreset, identifyQualityPreset} from './quality-presets';
+  import {waitForMinimumBuildTime} from './build-timing';
   import {APP_NAME} from '../packager/brand';
 
   export let projectData;
@@ -31,7 +31,8 @@
     .filter(i => i.isCloud)
     .map(i => i.name);
 
-  const defaultOptions = Packager.DEFAULT_OPTIONS();
+  const projectDefaults = Packager.DEFAULT_OPTIONS();
+  const defaultOptions = createQualityPreset(projectDefaults, 'medium');
   defaultOptions.projectId = projectData.projectId || `p4-${projectData.uniqueId}`;
   for (const variable of cloudVariables) {
     defaultOptions.cloudVariables.custom[variable] = 'ws';
@@ -52,17 +53,10 @@
   const hasSettingsStoredInProject = hasMagicComment(' // _twconfig_');
 
   let result = null;
-  let previewer = null;
-  const resetResult = () => {
-    previewer = null;
-    if (result) {
-      URL.revokeObjectURL(result.url);
-    }
-    result = null;
-  }
-  $: if (previewer) {
-    previewer.setProgress($progress.progress, $progress.text);
-  }
+  let building = false;
+  let buildController;
+  $: selectedPreset = identifyQualityPreset($options, defaultOptions);
+  const resetResult = () => { result = null; };
   $: $options, resetResult(), currentTask.abort();
 
   const icon = fileStore.writableFileStore(`PackagerOptions.icon.${projectData.uniqueId}`);
@@ -82,25 +76,6 @@
     $customCursorIcon = $options.cursor.custom;
     $loadingScreenImage = $options.loadingScreen.image;
   };
-
-  const otherEnvironmentsInitiallyOpen = ![
-    'html',
-    'zip',
-    'electron-win32',
-    'webview-mac',
-    'electron-linux64'
-  ].includes($options.target);
-
-  const advancedOptionsInitiallyOpen = (
-    $options.compiler.enabled !== defaultOptions.compiler.enabled ||
-    $options.compiler.warpTimer !== defaultOptions.compiler.warpTimer ||
-    $options.bakeExtensions !== defaultOptions.bakeExtensions ||
-    $options.custom.css !== '' ||
-    $options.custom.js !== '' ||
-    $options.projectId !== defaultOptions.projectId ||
-    $options.packagedRuntime !== defaultOptions.packagedRuntime ||
-    $options.maxTextureDimension !== defaultOptions.maxTextureDimension
-  );
 
   const automaticallyCenterCursor = () => {
     const icon = $customCursorIcon;
@@ -164,30 +139,30 @@
     result.blob = new Blob([result.data], {
       type: result.type
     });
-    result.url = URL.createObjectURL(result.blob);
     return result;
   };
 
-  const pack = async () => {
-    resetResult();
-    const task = new Task();
-    result = await task.do(runPackager(task, deepClone($options)));
-    task.done();
-    window.parent.postMessage({p4:{type:'export-ready', name:result.filename, mime:result.type, blob:result.blob}}, location.origin);
-  };
+  const selectPreset = quality => setOptions(createQualityPreset(defaultOptions, quality));
 
-  const preview = async () => {
+  const pack = async () => {
+    if (building) return;
     resetResult();
-    previewer = new Preview();
+    building = true;
+    const started = performance.now();
+    buildController = new AbortController();
     const task = new Task();
-    const optionsClone = deepClone($options);
-    optionsClone.target = 'html';
+    task.whenAbort(() => buildController.abort());
     try {
-      result = await task.do(runPackager(task, optionsClone));
+      const output = await task.do(runPackager(task, deepClone($options)));
+      await waitForMinimumBuildTime(started, buildController.signal);
+      result = output;
       task.done();
-      previewer.setContent(result.blob, optionsClone.app.windowTitle);
+      window.parent.postMessage({p4: {type: 'export-ready', name: result.filename,
+        mime: result.type, blob: result.blob}}, location.origin);
     } catch (e) {
-      previewer.close();
+      if (!task.aborted) task.error(e);
+    } finally {
+      building = false;
     }
   };
 
@@ -267,9 +242,8 @@
   };
 
   onDestroy(() => {
-    if (result) {
-      URL.revokeObjectURL(result.url);
-    }
+    if (buildController) buildController.abort();
+    currentTask.abort();
   });
 </script>
 
@@ -322,8 +296,45 @@
     display: flex;
     margin-left: auto;
   }
+  .presets { display: flex; gap: 12px; }
+  .presets button { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 16px; text-align: start; border: 2px solid var(--packager-border); background: var(--packager-surface)!important; color: var(--packager-text); cursor: pointer; }
+  .presets .chosen { border-color: var(--packager-accent); box-shadow: 0 0 0 2px var(--packager-accent); }
+  .presets span { font-size: 0.9em; opacity: 0.8; }
+  .advanced-controls { max-width: 657px; margin: 12px auto; }
+  .advanced-controls > summary { padding: 14px; border: 1px solid var(--packager-border); border-radius: 8px; background: var(--packager-surface); font-weight: bold; }
+  .recommendation { padding: 8px 14px; font-size: 0.95em; opacity: 0.8; }
+  .custom-preset { font-size: 0.9em; }
+  .build-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: var(--packager-background); }
+  .build-card { width: 360px; max-width: 100%; text-align: center; padding: 24px; border: 1px solid var(--packager-border); border-radius: 16px; background: var(--packager-surface); box-shadow: 0 12px 48px #0002; }
+  .build-spinner { width: 52px; height: 52px; margin: 0 auto 20px; border: 4px solid var(--packager-border); border-top-color: var(--packager-accent); border-radius: 50%; animation: spin 0.9s linear infinite; }
+  .build-track { height: 5px; margin-top: 20px; overflow: hidden; border-radius: 8px; background: var(--packager-border); }
+  .build-track span { display: block; width: 35%; height: 100%; border-radius: inherit; background: var(--packager-accent); animation: sweep 1.6s ease-in-out infinite alternate; }
+  .build-note { font-size: 0.85em; opacity: 0.75; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes sweep { to { transform: translateX(185%); } }
+  @media (prefers-reduced-motion: reduce) { .build-spinner, .build-track span { animation: none; } }
+  @media (max-width: 500px) { .presets { flex-direction: column; } }
 </style>
 
+<div aria-busy={building} inert={building}>
+<Section accent="#4c97ff">
+  <h2>{$_('embedded.quality')}</h2>
+  <div class="presets" role="group" aria-label={$_('embedded.quality')}>
+    <button type="button" class:chosen={selectedPreset === 'high'} aria-pressed={selectedPreset === 'high'} on:click={() => selectPreset('high')}>
+      <strong>{$_('embedded.high')}</strong>
+      <span>{$_('embedded.highDescription')}</span>
+    </button>
+    <button type="button" class:chosen={selectedPreset === 'medium'} aria-pressed={selectedPreset === 'medium'} on:click={() => selectPreset('medium')}>
+      <strong>{$_('embedded.medium')}</strong>
+      <span>{$_('embedded.mediumDescription')}</span>
+    </button>
+  </div>
+  {#if !selectedPreset}<p class="custom-preset">{$_('embedded.customized')}</p>{/if}
+</Section>
+
+<details class="advanced-controls">
+  <summary>{$_('embedded.advanced')}</summary>
+  <p class="recommendation">{$_('embedded.recommendation')}</p>
 <Section
   accent="#FFAB19"
   reset={() => {
@@ -717,9 +728,7 @@
   }}
 >
   <div>
-    <h2>{$_('options.advancedOptions')}</h2>
-    <details open={advancedOptionsInitiallyOpen}>
-      <summary>{$_('options.advancedSummary')}</summary>
+    <h2>{$_('embedded.engineOptions')}</h2>
 
       <div class="option">
         <label>
@@ -767,7 +776,6 @@
         }} />
         {$_('options.maxTextureDimension')}
       </label>
-    </details>
   </div>
 </Section>
 
@@ -787,14 +795,27 @@
   </DropArea>
 </Section>
 
+</details>
+
 <Section>
   <div class="buttons">
     <div class="button">
       <Button on:click={pack} text={$_('options.package')} />
     </div>
-    <div clas="button">
 
-    </div>
   </div>
 </Section>
 
+
+</div>
+{#if building}
+  <div class="build-overlay" role="status" aria-live="polite">
+    <div class="build-card">
+      <div class="build-spinner" aria-hidden="true"></div>
+      <h2>{$_('embedded.building')}</h2>
+      <p>{$progress.text || $_('embedded.preparing')}</p>
+      <div class="build-track" aria-hidden="true"><span></span></div>
+      <p class="build-note">{$_('embedded.buildNote')}</p>
+    </div>
+  </div>
+{/if}

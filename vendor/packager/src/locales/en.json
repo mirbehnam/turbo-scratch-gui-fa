@@ -692,5 +692,43 @@
       "string": "Cancel",
       "description": "Button to cancel import"
     }
+  },
+  "embedded": {
+    "quality": {
+      "string": "Playback quality"
+    },
+    "high": {
+      "string": "Highest quality"
+    },
+    "medium": {
+      "string": "Medium quality"
+    },
+    "highDescription": {
+      "string": "Smoother movement and high quality pen."
+    },
+    "mediumDescription": {
+      "string": "Standard rendering with lower processing cost."
+    },
+    "advanced": {
+      "string": "Advanced settings"
+    },
+    "recommendation": {
+      "string": "We recommend leaving the following settings unchanged."
+    },
+    "customized": {
+      "string": "Advanced settings have been customized. Select a preset to restore its settings."
+    },
+    "engineOptions": {
+      "string": "Engine and code"
+    },
+    "building": {
+      "string": "Creating your HTML file"
+    },
+    "preparing": {
+      "string": "Preparing the project…"
+    },
+    "buildNote": {
+      "string": "Your original project stays unchanged."
+    }
   }
 }

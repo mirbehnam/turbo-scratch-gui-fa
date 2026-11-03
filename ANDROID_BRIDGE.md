@@ -31,6 +31,15 @@ their existing network behavior.
 
 ## Host contracts
 
+The loader entry point accepts a queued Android URL during startup, but waits for
+Redux to show a ready project before fetching it and dispatching an upload. A
+component mounting is not a signal that default-project initialization has finished.
+The pending URL is consumed once on the ready transition and cleared on unmount.
+Keeping the command available also avoids losing it to the host's bounded polling.
+
+The packager's native HTML player uses a separate WebView with no editor bridges;
+see [docs/EMBEDDED_PACKAGER.md](docs/EMBEDDED_PACKAGER.md).
+
 `src/lib/android-bridge.js` manages the bridge. The host injects
 `window.AndroidProjectSaver` and, for native text input,
 `window.AndroidScratchTextInput` before loading the editor.

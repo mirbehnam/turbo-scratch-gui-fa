@@ -23,7 +23,7 @@ const fs = require('fs');
 const childProcess = require('child_process');
 const rimraf = require('rimraf');
 const pathUtil = require('path');
-const {addons, newAddons} = require('./addons.js');
+const {addons, enabledByDefaultOverrides, newAddons} = require('./addons.js');
 const supportedLocaleCodes = require('../lib/supported-locale-codes.json');
 
 const walk = dir => {
@@ -181,6 +181,10 @@ const rewriteAssetImports = contents => {
 };
 
 const normalizeManifest = (id, manifest) => {
+    if (Object.prototype.hasOwnProperty.call(enabledByDefaultOverrides, id)) {
+        manifest.enabledByDefault = enabledByDefaultOverrides[id];
+        delete manifest.enabledByDefaultMobile;
+    }
     const KEEP_TAGS = [
         'recommended',
         'theme',

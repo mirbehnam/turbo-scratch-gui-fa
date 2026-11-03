@@ -514,7 +514,7 @@ test('Settings migration 3 -> 4', () => {
     });
     store.readLocalStorage();
     assert.equal(store.getAddonEnabled('editor-devtools'), true);
-    assert.equal(store.getAddonEnabled('find-bar'), true);
+    assert.equal(store.getAddonEnabled('find-bar'), false);
     assert.equal(store.getAddonEnabled('middle-click-popup'), true);
 
     globalThis.localStorage.getItem = () => JSON.stringify({

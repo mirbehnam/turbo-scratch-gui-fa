@@ -72,3 +72,20 @@ test('Android transport waits for native acknowledgements and propagates errors'
         assert.deepEqual(operations, ['begin', 'append', 'save', 'cancel']);
     } finally { delete globalThis.window; }
 });
+
+test('Android direct play streams HTML to the isolated player without saving or sharing', async () => {
+    const operations = [];
+    const bridge = {postMessage: json => {
+        const message = JSON.parse(json);
+        operations.push(message);
+        queueMicrotask(() => bridge.onmessage({data: JSON.stringify({id: message.id, ok: true, transfer: 'player'})}));
+    }};
+    globalThis.window = {AndroidPackagedExport: bridge};
+    try {
+        await exportPackagedFile(new Blob(['<html>test</html>'], {type: 'text/html'}), 'test.html',
+            'preview', 'fa', {dark: true});
+        assert.deepEqual(operations.map(message => message.op), ['begin', 'append', 'preview']);
+        assert.equal(operations.at(-1).locale, 'fa');
+        assert.equal(operations.at(-1).dark, true);
+    } finally { delete globalThis.window; }
+});

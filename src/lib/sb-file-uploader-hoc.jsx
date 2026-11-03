@@ -59,12 +59,18 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             );
         }
         componentDidUpdate (prevProps) {
+            if (this.props.isShowingProject && this.pendingAndroidProject) {
+                const {url, filename} = this.pendingAndroidProject;
+                this.pendingAndroidProject = null;
+                this.loadProjectFromUrl(url, filename);
+            }
             if (this.props.isLoadingUpload && !prevProps.isLoadingUpload && this.expectingFileUploadFinish) {
                 this.handleFinishedLoadingUpload(); // cue step 5 below
             }
         }
         componentWillUnmount () {
             this.unregisterAndroidLoader();
+            this.pendingAndroidProject = null;
             this.removeFileObjects();
         }
         // step 1: this is where the upload process begins
@@ -73,6 +79,10 @@ const SBFileUploaderHOC = function (WrappedComponent) {
             this.createFileObjects(); // go to step 2
         }
         loadProjectFromUrl (url, filename) {
+            if (!this.props.isShowingProject) {
+                this.pendingAndroidProject = {url, filename};
+                return Promise.resolve();
+            }
             return readAndroidProject(url, filename)
                 .then(file => {
                     this.removeFileObjects();

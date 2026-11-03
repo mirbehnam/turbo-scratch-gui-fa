@@ -88,8 +88,14 @@ const newAddons = [
     'debugger'
 ];
 
+const enabledByDefaultOverrides = {
+    'find-bar': false,
+    'hide-flyout': true
+};
+
 // eslint-disable-next-line import/no-commonjs
 module.exports = {
     addons,
+    enabledByDefaultOverrides,
     newAddons
 };

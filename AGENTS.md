@@ -6,6 +6,13 @@ iframe protocol, pinned vendor sources, local scaffolding or native export bridg
 Preserve automatic current-project import, fa/ar/en, no intro/project chooser,
 Downloads save, native sharing and the main-frame/origin restrictions. Every build
 must include `build/packager`; `build:android` also packages it in both Windows builds.
+Quality presets default to Medium and Advanced settings stay collapsed. Successful
+generation shows a cancellable loading screen for at least five seconds total.
+Direct play uses a sandboxed iframe in browser/Electron and the Android client's
+separate bridge-free PackagedPlayerActivity. Never run packaged HTML in an Android
+WebView that has the editor's JavaScript interfaces. Android saved-project commands can arrive during startup. Queue them until a
+SHOWING project state before fetching/dispatching an upload. Keep the native entry
+point available during startup so the host's bounded polling cannot lose a command.
 
 Before changing Android input/loading/saving or build/desktop packaging, read
 [ANDROID_BRIDGE.md](ANDROID_BRIDGE.md) and [MY_DEVELOP_CHANGES.md](MY_DEVELOP_CHANGES.md).
@@ -37,6 +44,9 @@ That dictionary also covers all theme menu labels and submenu choices. The defau
 accent is blue; preserve explicit saved theme choices. See docs/NOT_YET_PORTED.md
 before porting additional customizations from the adjacent Scratch repository.
 After updating generated addon/TurboWarp translations, run `npm run locales:prune`.
+Addon defaults in addons.js override Find Bar to disabled and Hide Flyout to
+enabled. Preserve these in regenerated manifests/entries; explicit saved user
+choices still take precedence over defaults.
 Do not modify installed dependencies to enforce language restrictions.
 
 All sprite/costume/backdrop/sound library assets and thumbnails must use the local

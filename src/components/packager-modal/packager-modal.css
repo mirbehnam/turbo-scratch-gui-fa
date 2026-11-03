@@ -12,11 +12,21 @@
 .modal-content > div { display: flex; flex-direction: column; min-height: 0; }
 .modal-content > div > div:first-child { flex-shrink: 0; }
 .body { flex: 1; min-height: 0; display: flex; flex-direction: column; background: $ui-modal-background; }
+.workspace { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .frame { flex: 1; width: 100%; min-height: 0; border: none; }
 .hidden { display: none; }
 .result { margin: auto; padding: 1rem; max-width: 36rem; text-align: center; overflow-y: auto; }
 .filename { overflow-wrap: anywhere; user-select: text; }
-.actions { display: flex; justify-content: center; gap: 0.75rem; margin: 1rem 0; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin: 1rem 0; }
 .button { padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: 1px solid $ui-black-transparent; background: $looks-secondary; color: white; cursor: pointer; }
 .button:disabled { opacity: 0.5; cursor: wait; }
 .error { color: #c22727; }
+.player-modal { margin: 0; width: 100%; height: 100%; }
+.player-modal > div { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.player { display: flex; flex-direction: column; flex: 1; min-height: 0; background: $ui-primary; }
+.player-toolbar { display: flex; align-items: center; flex-shrink: 0; gap: 0.5rem; padding: 0.5rem; background: $ui-secondary; border-bottom: 1px solid $ui-black-transparent; }
+.player-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 0.5rem; }
+.player-button { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.75rem; border: 1px solid $ui-black-transparent; border-radius: 0.5rem; background: $ui-primary; color: $text-primary; font: inherit; cursor: pointer; }
+.player-button:hover { background: $looks-transparent; }
+.player-button svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.player-frame { flex: 1; width: 100%; min-height: 0; border: 0; background: black; }
