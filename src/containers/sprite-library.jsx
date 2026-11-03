@@ -9,6 +9,7 @@ import randomizeSpritePosition from '../lib/randomize-sprite-position';
 import spriteTags from '../lib/libraries/sprite-tags';
 
 import LibraryComponent from '../components/library/library.jsx';
+import translateLibraryName from '../lib/libraries/translate-library-name.js';
 
 const messages = defineMessages({
     libraryTitle: {
@@ -37,14 +38,16 @@ class SpriteLibrary extends React.PureComponent {
     }
     handleItemSelect (item) {
         // Randomize position of library sprite
-        randomizeSpritePosition(item);
-        this.props.vm.addSprite(JSON.stringify(item)).then(() => {
+        const localizedItem = {...item, name: translateLibraryName('sprites', item.name, this.props.intl.locale)};
+        randomizeSpritePosition(localizedItem);
+        this.props.vm.addSprite(JSON.stringify(localizedItem)).then(() => {
             this.props.onActivateBlocksTab();
         });
     }
     render () {
         return (
             <LibraryComponent
+                libraryType="sprites"
                 data={this.state.data.then ? null : this.state.data}
                 id="spriteLibrary"
                 tags={spriteTags}

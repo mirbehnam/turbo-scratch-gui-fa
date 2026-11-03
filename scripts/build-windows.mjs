@@ -142,6 +142,7 @@ const prepareArchitecture = async (architecture, version) => {
     await mkdir(appDirectory, {recursive: true});
     await cp(buildDirectory, path.join(appDirectory, 'build'), {recursive: true});
     await cp(path.join(desktopDirectory, 'main.cjs'), path.join(appDirectory, 'main.cjs'));
+    await cp(path.join(desktopDirectory, 'window-config.cjs'), path.join(appDirectory, 'window-config.cjs'));
     await cp(path.join(packageRoot, 'static', 'images', '512.png'), path.join(appDirectory, 'icon.png'));
     await writeFile(path.join(appDirectory, 'package.json'), `${JSON.stringify({
         name: 'turbowarp-fa-desktop',

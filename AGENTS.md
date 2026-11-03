@@ -20,8 +20,15 @@ and three-language dialog outside Settings, and do not restore the Feedback butt
 Read `docs/PERSIAN_CUSTOMIZATIONS.md` for the locale loaders and source pruning.
 Keep the bundled BYekan font on editor controls, block text and the TurboWarp
 toolbox's `.scratchCategoryMenuItemLabel`. Do not change fonts inside user costumes.
-The app entry point disables the See Project Page button; preserve player/fullscreen
-functionality and the public GUI component's optional community interface.
+The See Project Page component, its CSS, handler and enableCommunity wiring are
+removed. Preserve player/fullscreen, Share's ProjectWatcher/onSeeCommunity and
+the icon shared with See Inside. The Addons toolbar button is temporarily gated
+by SHOW_ADDONS_BUTTON; keep addon source, runtime and settings intact. The username
+and cloud-variable menu entries are removed; their underlying features remain.
+Advanced dialog translations live in src/lib/tw-translations/custom-settings.json.
+That dictionary also covers all theme menu labels and submenu choices. The default
+accent is blue; preserve explicit saved theme choices. See docs/NOT_YET_PORTED.md
+before porting additional customizations from the adjacent Scratch repository.
 After updating generated addon/TurboWarp translations, run `npm run locales:prune`.
 Do not modify installed dependencies to enforce language restrictions.
 
@@ -33,6 +40,23 @@ After changing catalogs, run `npm run assets:download`, commit the updated
 run `npm run build:verify-offline`. The verifier checks completeness and original
 MD5 content hashes. Keep unrelated online services and unbundled project/custom
 font fallbacks distinct from the offline media-library guarantee.
+Persian names and bilingual media search use src/lib/libraries/translations/fa.js,
+translate-library-name.js and library-item-search.js. Keep catalog keys, favorites,
+asset URLs and names in existing projects unchanged; localize only library display
+and newly selected built-in media. Include TurboWarp-specific sprites in coverage.
+
+The Make a Block dialog is compact, scrolls inside its own bounded overlay and
+does not focus a text input on opening. Do not replace its percentage height bound
+with vh units in the Android host. Windows closes through window-config.cjs's
+localized confirmation; Cancel must preserve the running window.
+
+General CI is manual on my-develop. Explicit exceptions are custom-release.yml
+(server builds Android assets and both Windows installers on root version upgrades
+or custom vX.Y.Z-fa.N tags) and restore-point.yml (every push to my-develop creates
+a commit-specific source prerelease/tag through GitHub APIs on the runner).
+Never create restore tags/archives locally, move existing restore tags, promote
+snapshots to Latest, or publish npm packages. Keep develop identical to origin/develop.
+Read docs/LIBRARY_DIALOG_RELEASE.md for these contracts and verification.
 
 Internal tutorials are intentionally removed from source and every GUI build.
 Read [docs/TUTORIAL_REMOVAL.md](docs/TUTORIAL_REMOVAL.md) before an upstream merge.

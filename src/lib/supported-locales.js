@@ -2,6 +2,7 @@ import arData from '@turbowarp/scratch-l10n/src/locale-data/ar.js';
 import enData from '@turbowarp/scratch-l10n/src/locale-data/en.js';
 import faData from '@turbowarp/scratch-l10n/src/locale-data/fa.js';
 import codes from './supported-locale-codes.json';
+import settingsMessages from './tw-translations/custom-settings.json';
 
 const locales = {ar: {name: 'العربية'}, en: {name: 'English'}, fa: {name: 'فارسی'}};
 const localeData = [].concat(arData, enData, faData);
@@ -13,6 +14,7 @@ const pickSupportedMessages = messages => codes.reduce((selected, locale) => {
 }, {});
 const messageOverrides = {
     ar: {
+        ...settingsMessages.ar,
         'tw.menuBar.advanced': 'متقدم',
         'gui.menuBar.language': 'اللغة',
         'gui.aria.languageMenu': 'اختيار اللغة',
@@ -20,6 +22,7 @@ const messageOverrides = {
     },
     en: {},
     fa: {
+        ...settingsMessages.fa,
         'tw.menuBar.advanced': 'پیشرفته',
         'gui.menuBar.language': 'زبان',
         'gui.aria.languageMenu': 'انتخاب زبان',

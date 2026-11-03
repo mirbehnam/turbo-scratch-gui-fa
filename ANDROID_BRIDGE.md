@@ -14,6 +14,9 @@ The VM, compiler, branding inside the editor, addon functionality, and media
 catalogs retain TurboWarp's behavior. The initial sprite is the Scratch cat,
 the default language is Persian RTL, and only Arabic/English/Persian are enabled
 through a standalone language dialog. See [docs/PERSIAN_CUSTOMIZATIONS.md](docs/PERSIAN_CUSTOMIZATIONS.md).
+Persian media names/search, the compact procedure dialog, localized Windows exit
+confirmation and server release/restore workflows are documented in
+[docs/LIBRARY_DIALOG_RELEASE.md](docs/LIBRARY_DIALOG_RELEASE.md).
 The internal tutorial
 system and its dedicated source assets have been removed; see
 [docs/TUTORIAL_REMOVAL.md](docs/TUTORIAL_REMOVAL.md) for the complete audited list.

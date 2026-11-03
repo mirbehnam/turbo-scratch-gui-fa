@@ -98,7 +98,6 @@ const GUIComponent = props => {
         costumeLibraryVisible,
         costumesTabVisible,
         customStageSize,
-        enableCommunity,
         intl,
         isCreating,
         isEmbedded,
@@ -291,7 +290,6 @@ const GUIComponent = props => {
                     canSave={canSave}
                     canShare={canShare}
                     className={styles.menuBarPosition}
-                    enableCommunity={enableCommunity}
                     isShared={isShared}
                     isTotallyNormal={isTotallyNormal}
                     logo={logo}
@@ -474,7 +472,6 @@ GUIComponent.propTypes = {
         width: PropTypes.number,
         height: PropTypes.number
     }),
-    enableCommunity: PropTypes.bool,
     intl: intlShape.isRequired,
     isCreating: PropTypes.bool,
     isEmbedded: PropTypes.bool,
@@ -545,7 +542,6 @@ GUIComponent.defaultProps = {
     canCreateCopy: false,
     canShare: false,
     canUseCloud: false,
-    enableCommunity: false,
     isCreating: false,
     isShared: false,
     isTotallyNormal: false,

@@ -105,10 +105,7 @@ class CustomProcedures extends React.Component {
         this.mutationRoot.initSvg();
         this.mutationRoot.render();
         this.setState({warp: this.mutationRoot.getWarp()});
-        // Allow the initial events to run to position this block, then focus.
-        setTimeout(() => {
-            this.mutationRoot.focusLastEditor_();
-        });
+
     }
     handleCancel () {
         this.props.onRequestClose();

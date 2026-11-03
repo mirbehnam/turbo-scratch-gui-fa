@@ -13,6 +13,8 @@ import Spinner from '../spinner/spinner.jsx';
 import Separator from '../tw-extension-separator/separator.jsx';
 import RemovedTrademarks from '../tw-removed-trademarks/removed-trademarks.jsx';
 import {APP_NAME} from '../../lib/brand.js';
+import translateLibraryName from '../../lib/libraries/translate-library-name.js';
+import {normalizeSearchText} from '../../lib/libraries/library-item-search.js';
 
 import styles from './library.css';
 
@@ -222,6 +224,9 @@ class LibraryComponent extends React.Component {
                     // Use the name if it is a string, else use formatMessage to get the translated name
                     if (typeof dataItem.name === 'string') {
                         search.push(dataItem.name);
+                        search.push(translateLibraryName(
+                            this.props.libraryType, dataItem.name, this.props.intl.locale
+                        ));
                     } else {
                         search.push(this.props.intl.formatMessage(dataItem.name.props, {
                             APP_NAME
@@ -237,10 +242,7 @@ class LibraryComponent extends React.Component {
                         }));
                     }
                 }
-                return search
-                    .join('\n')
-                    .toLowerCase()
-                    .includes(this.state.filterQuery.toLowerCase());
+                return normalizeSearchText(search.join('\n')).includes(normalizeSearchText(this.state.filterQuery));
             });
         }
 
@@ -332,7 +334,11 @@ class LibraryComponent extends React.Component {
                                         dataItem.name :
                                         dataItem.rawURL
                                 )}
-                                name={dataItem.name}
+                                name={typeof dataItem.name === 'string' ?
+                                    translateLibraryName(
+                                        this.props.libraryType, dataItem.name, this.props.intl.locale
+                                    ) :
+                                    dataItem.name}
                                 credits={dataItem.credits}
                                 samples={dataItem.samples}
                                 docsURI={dataItem.docsURI}
@@ -385,6 +391,7 @@ LibraryComponent.propTypes = {
         PropTypes.instanceOf(Promise)
     ]),
     filterable: PropTypes.bool,
+    libraryType: PropTypes.oneOf(['sprites', 'backdrops', 'sounds']),
     id: PropTypes.string.isRequired,
     persistableKey: PropTypes.string,
     intl: intlShape.isRequired,

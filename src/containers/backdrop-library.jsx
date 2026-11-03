@@ -7,6 +7,7 @@ import VM from 'scratch-vm';
 import {getBackdropLibrary} from '../lib/libraries/tw-async-libraries';
 import backdropTags from '../lib/libraries/backdrop-tags';
 import LibraryComponent from '../components/library/library.jsx';
+import translateLibraryName from '../lib/libraries/translate-library-name.js';
 
 const messages = defineMessages({
     libraryTitle: {
@@ -36,7 +37,7 @@ class BackdropLibrary extends React.Component {
     }
     handleItemSelect (item) {
         const vmBackdrop = {
-            name: item.name,
+            name: translateLibraryName('backdrops', item.name, this.props.intl.locale),
             rotationCenterX: item.rotationCenterX,
             rotationCenterY: item.rotationCenterY,
             bitmapResolution: item.bitmapResolution,
@@ -48,6 +49,7 @@ class BackdropLibrary extends React.Component {
     render () {
         return (
             <LibraryComponent
+                libraryType="backdrops"
                 data={this.state.data.then ? null : this.state.data}
                 id="backdropLibrary"
                 tags={backdropTags}

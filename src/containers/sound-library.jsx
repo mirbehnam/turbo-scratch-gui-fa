@@ -7,6 +7,7 @@ import AudioEngine from 'scratch-audio';
 import SharedAudioContext from '../lib/audio/shared-audio-context';
 
 import LibraryComponent from '../components/library/library.jsx';
+import translateLibraryName from '../lib/libraries/translate-library-name.js';
 
 import soundIcon from '../components/library-item/lib-icon--sound.svg';
 import soundIconRtl from '../components/library-item/lib-icon--sound-rtl.svg';
@@ -142,7 +143,7 @@ class SoundLibrary extends React.PureComponent {
                 if (soundAsset) {
                     const sound = {
                         md5: md5ext,
-                        name: soundItem.name,
+                        name: translateLibraryName('sounds', soundItem.name, this.props.intl.locale),
                         format: soundItem.format,
                         data: soundAsset.data
                     };
@@ -172,7 +173,7 @@ class SoundLibrary extends React.PureComponent {
             md5: soundItem._md5,
             rate: soundItem.rate,
             sampleCount: soundItem.sampleCount,
-            name: soundItem.name
+            name: translateLibraryName('sounds', soundItem.name, this.props.intl.locale)
         };
         this.props.vm.addSound(vmSound).then(() => {
             this.props.onNewSound();
@@ -181,6 +182,7 @@ class SoundLibrary extends React.PureComponent {
     render () {
         return (
             <LibraryComponent
+                libraryType="sounds"
                 showPlayButton
                 data={this.state.data}
                 id="soundLibrary"

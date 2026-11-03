@@ -13,7 +13,6 @@ const RenderGUI = props => (
         basePath={process.env.ROOT}
         canEditTitle
         {...props}
-        enableCommunity={false}
     />
 );
 

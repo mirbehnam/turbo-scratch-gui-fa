@@ -1,4 +1,5 @@
-const {app, BrowserWindow, session, shell} = require('electron');
+const {app, BrowserWindow, dialog, session, shell} = require('electron');
+const {createCloseHandler} = require('./window-config.cjs');
 const http = require('node:http');
 const fs = require('node:fs/promises');
 const path = require('node:path');
@@ -73,6 +74,7 @@ const createWindow = () => {
         webPreferences: {contextIsolation: true, nodeIntegration: false, sandbox: true}
     });
     window.setMenuBarVisibility(false);
+    window.on('close', createCloseHandler({app, dialog, mainWindow: window, logger: console}));
     window.once('ready-to-show', () => window.show());
     window.webContents.on('page-title-updated', event => {
         event.preventDefault();
