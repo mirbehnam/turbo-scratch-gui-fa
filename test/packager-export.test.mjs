@@ -89,3 +89,19 @@ test('Android direct play streams HTML to the isolated player without saving or 
         assert.equal(operations.at(-1).dark, true);
     } finally { delete globalThis.window; }
 });
+
+test('cancelled HTML playback transfer never sends a preview operation', async () => {
+    const controller = new AbortController();
+    const calls = [];
+    globalThis.window = {desktopPackager: {request: async message => {
+        calls.push(message.op);
+        if (message.op === 'begin') return {transfer: 'cancel-test'};
+        if (message.op === 'append') controller.abort();
+        return {};
+    }}};
+    try {
+        await assert.rejects(exportPackagedFile(new Blob(['html'], {type: 'text/html'}), 'project.html', 'preview', 'fa',
+            {signal: controller.signal}), {name: 'AbortError'});
+        assert.deepEqual(calls, ['begin', 'append', 'cancel']);
+    } finally { delete globalThis.window; }
+});

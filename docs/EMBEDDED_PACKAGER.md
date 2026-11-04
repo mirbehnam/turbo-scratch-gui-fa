@@ -131,8 +131,8 @@ npm run build:verify-offline
 نقطهٔ بازگشت پیش از این مرحله `d64b881` در GUI و `d741710` در کلاینت اندروید است.
 
 رابط ساده دو پریست دارد و «کیفیت متوسط» برای تنظیمات تازه پیش‌فرض است. هر دو از
-HTML مستقل، حفظ نسبت تصویر، شروع خودکار، نشانگر عادی، توقف، مکث و تمام‌صفحه استفاده
-می‌کنند. در «بالاترین کیفیت» Interpolation و High Quality Pen هم روشن‌اند؛ در
+HTML مستقل، حفظ نسبت تصویر، شروع خودکار و نشانگر عادی استفاده می‌کنند. کنترل‌های
+توقف، مکث و تمام‌صفحهٔ داخل HTML در هر دو پریست خاموش‌اند. در «بالاترین کیفیت» Interpolation و High Quality Pen هم روشن‌اند؛ در
 «کیفیت متوسط» این دو خاموش‌اند. مشخصات پایهٔ موتور مثل compiler، packaged runtime،
 محدودیت‌های عادی اسکرچ و نرخ 30 فریم در تنظیمات استاندارد ابزار باقی می‌مانند.
 این نام‌ها preset تنظیمات هستند و تضمین مطلق کیفیت/سرعت برای هر پروژه نیستند.
@@ -156,9 +156,9 @@ HTML به parent یا preload دسترسی ندارد و URL موقت هنگام
 قابلیت‌های نیازمند origin/storage مرورگر در چنین sandboxی محدودند؛ فایل ذخیره‌شده
 را می‌توان در مرورگر مستقل اجرا کرد. در اندروید از iframe داخل WebView ویرایشگر
 استفاده نمی‌شود، چون addJavascriptInterface در تمام فریم‌های آن در دسترس است.
-پل امن، HTML را در کش خصوصی کامل می‌کند و `PackagedPlayerActivity` را با WebView
+پل امن، HTML را در کش خصوصی کامل می‌کند و `PackagedHtmlPlayer` را در همان ScratchScreen با WebView
 جدا، بدون هیچ پل پروژه/ورودی/خروجی باز می‌کند. ذخیره‌سازی عادی HTML در آن فعال است.
-این Activity فایل محلی تکمیل‌شده را با asset loader محدود می‌خواند، از تمام‌صفحه
+این پخش‌کننده فایل محلی تکمیل‌شده را با asset loader محدود می‌خواند، از تمام‌صفحه
 پشتیبانی می‌کند و هنگام بستن WebView و فایل موقت خودش را آزاد می‌کند.
 
 پریست، حداقل زمان، لغو timer و انتقال native preview در آزمون‌های واحد پوشش دارند.
@@ -187,3 +187,52 @@ assets خام و داخل APK نهایی با build یکسان‌اند؛ هر �
 دو نصب‌کنندهٔ ویندوز نیز از همین فایل‌ها ساخته شده‌اند. دستور i18n:src همچنان با
 شناسهٔ تکراری قدیمی gui.menuBar.downloadToComputer متوقف می‌شود؛ lint فایل‌های
 تغییرکرده موفق است و پیام‌های جدید فارسی/عربی/انگلیسی بررسی شده‌اند.
+
+## نوار کناری در پخش HTML
+
+نقطهٔ بازگشت پیش از این مرحله: GUI `cc95399` و کلاینت `fd6c9c3`.
+دکمه‌های توقف، مکث و تمام‌صفحهٔ خروجی در تمام پریست‌ها غیرفعال‌اند. انتخاب پریست
+مستقیماً همان store متصل به checkboxهای پیشرفته را تغییر می‌دهد؛ state موازی ندارد.
+
+نوار افقی عنوان/دکمه‌های پخش حذف شده است. در اندروید، اجرای HTML داخل صفحهٔ موجود
+و با WebView مستقل روی origin خصوصی player.farsiscratch.invalid انجام می‌شود.
+ویرایشگر اصلی پنهان می‌ماند و دوباره ساخته یا بارگذاری نمی‌شود. نوار سمت چپ،
+صفحه‌کلید شناور و میانبرهای قبلی حفظ می‌شوند؛ خانه و اسلایدر پیمایش موقتاً حذف و
+دو آیکون بستن/رفرش اضافه می‌شوند. کلیدها به View پخش‌کننده هدایت می‌شوند و پیش از
+رفرش یا بستن رها می‌شوند. بستن HTML همان editor/result را با خانه و اسلایدر برمی‌گرداند.
+FullScreen سفارشی فقط محتوای قاب بازی را تعویض می‌کند تا نوار چپ قابل نمایش بماند.
+مرورگر/ویندوز نیز به‌جای نوار افقی دو آیکون را در ستون سمت چپ نشان می‌دهند.
+
+
+## Android private HTML library
+
+Android HTML Save persists the completed file in the host's private My Projects
+library. The bridge responds with `location: "library"` and the localized result
+says Saved in My Projects. Windows/browser downloads and settings JSON saves keep
+their existing destinations. The native library defaults to SB3 and has a separate
+HTML tab with Play and Share. Library playback copies the saved file into a fresh
+private playback cache; closing destroys the player and deletes only that copy.
+Direct Share from the packager remains a temporary export and does not implicitly
+save a library entry. Existing Downloads files are not scanned or moved.
+
+## Automatic quality playback
+
+The toolbar button uses `packager/index.html?autobuild=high`, the same current VM
+snapshot and high preset. It has no artificial five-second wait. The builder
+unmounts when HTML is ready, and closing destroys the sandbox player/revokes its
+URL or asks Android to dispose the bridge-free native player. AbortSignal cancels
+an in-flight export; manual packaging retains its five-second indicator.
+The original Scratch GUI now exposes the equivalent manual packager using its
+own pinned local runtime and the same Android host protocol.
+
+## Isolated SVG-compatible desktop player
+
+The manual and quality-run players load a `data:` bootstrap inside a sandboxed
+iframe with `allow-same-origin`. The data document has its own opaque origin; it
+receives the HTML Blob only from its parent and creates the player Blob URL there.
+The running project cannot access the editor origin or desktop/native bridges,
+but its SVG renderer can access its own no-script sandbox iframe. Removing the
+player frame ends the isolated player; refresh creates a fresh bootstrap frame.
+Do not create the player Blob URL in the editor origin and then add
+`allow-same-origin`: that combination would expose the editor to the project.
+Native Android playback continues to use its separate bridge-free WebView.

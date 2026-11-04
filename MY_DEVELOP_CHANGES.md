@@ -213,3 +213,102 @@ overrideها در src/addons/addons.js و pull.js ثبت شده‌اند تا ب
 فرمان پروژهٔ ذخیره‌شدهٔ اندروید که هنگام بارگذاری اولیه می‌رسد تا آماده‌شدن حالت
 SHOWING در صف می‌ماند؛ این اصلاح خطای Could not load project در مسیر خانه را رفع
 می‌کند. شرح کامل و آزمون‌ها در docs/EMBEDDED_PACKAGER.md است.
+
+## کنترل‌های پخش و نوار کناری
+
+در همهٔ پریست‌ها، کنترل‌های stop/pause/fullscreen داخل HTML خاموش‌اند. انتخاب پریست
+و تیک‌های Advanced از یک store استفاده می‌کنند. نوار افقی پخش حذف شده است؛ در اندروید
+همان نوار سمت چپ هنگام پخش HTML باقی می‌ماند، خانه و اسلایدر مخفی و بستن/رفرش اضافه
+می‌شوند. صفحه‌کلید روی HTML فعال کار می‌کند و بستن، همان ویرایشگر قبلی را برمی‌گرداند.
+جزئیات و نقاط بازگشت در docs/EMBEDDED_PACKAGER.md ثبت شده‌اند.
+
+## Category click as the palette default
+
+Auto-hiding block palette remains enabled by default; its `toggle` setting now
+uses `category` (Category click). This override is applied in `src/addons/pull.js`
+as well as the generated manifest so updating addons preserves the default.
+Explicit previously saved user settings are preserved.
+
+The embedded packager also accepts `autobuild=high` for the original Scratch
+editor's separate high-quality player. It resets options to the high preset,
+builds automatically after project import and reports failures to the parent.
+Local-file Electron hosting uses an opaque-origin postMessage target only for
+`file:` pages and still checks the exact parent/frame source on receipt.
+
+## Mobile category taps
+
+Hover presets cannot rely on desktop mouse-enter events on touchscreens. A
+capture-phase touchend adapter in `src/addons/mobile-category-tap.js` selects and
+opens/closes the touched category for the saved hover/cathover presets. The
+category-click preset retains Blockly's normal touch handling. Multitouch, active
+workspace drags, disabled addons and all real mouse events keep their normal
+paths. The adapter cancels only a handled category touch to prevent duplicate
+selection/synthetic clicks. `pull.js` reapplies this integration and fails clearly
+if upstream changes its toolbox integration point. Browser touch tests reproduced
+a closed palette before the fix and confirmed short-tap open/repeated-tap close
+afterward; desktop hover/click behavior was checked separately.
+
+Validation: 88 unit tests passed. Browser tests reproduced the saved hover-mode
+short-tap failure and verified tap-to-open/tap-to-close afterward; desktop mouse
+behavior was unchanged. Persian/Arabic/English packaging tests still verify the
+manual >=5s loading display, exact medium/high controls, sandbox playback,
+refresh and editor preservation. The default category-click mode was also tested
+with touch and mouse. Android/Windows outputs were rebuilt and the Android raw
+assets updated; both Windows architectures contain the same web files as build/.
+
+
+Android HTML Save now uses the host's private My Projects library rather than
+Downloads; its acknowledged response selects a new fa/ar/en Saved in My Projects
+message. Windows/browser behavior remains unchanged. See docs/EMBEDDED_PACKAGER.md
+and the Android client's docs/PACKAGED_HTML_EXPORT.md for storage/playback ownership.
+
+## Quality playback, restore translations and Persian branding — 2026-11-04
+
+Added the toolbar quality-run button next to the project title (on its visual left
+in Persian). It uses the local packager high preset, skips the manual five-second
+wait and cleans up the builder/player. The abortable export path is shared with
+the existing manual packager. The editor VM and project remain unchanged.
+
+Translated Restore points menu, dialog, intervals, errors, row actions and delete
+confirmation into Persian/Arabic; fixed the duplicated restore-load message ID.
+Translated both states of the 60 FPS toggle and Advanced Settings menu. Interface
+explanations use localized Scratch Farsi branding, preserving URLs and licenses.
+Added the generated transparent Persian toolbar wordmark as an inert first item;
+its exact generation prompt and provenance are in docs/TOOLBAR_BRANDING.md.
+
+Validation: 91 unit tests passed. Browser tests in fa/ar/en covered real restore
+snapshots/actions, both FPS states, Advanced explanations, branding/position,
+automatic quality playback, refresh and cleanup; automatic build-to-playback took
+under one second for the default project. Android assets and both Windows
+installers were rebuilt with npm run build:android. Changed files introduced no
+new lint errors; menu-bar.jsx retains 19 pre-existing errors (HEAD had 21).
+The global i18n:src command remains blocked by the existing duplicate
+gui.menuBar.downloadToComputer ID; runtime locale coverage tests pass.
+
+Real Electron validation also passed for the new quality-run button on x64 and
+ia32: file-origin messaging, automatic offline build, isolated HTML playback,
+refresh and cleanup. Native Android packager/library tests passed on the connected
+Android 16 device; the combined APK was installed with both updated web engines.
+
+## SVG rendering in isolated desktop playback
+
+Manual direct play and the quality-run player now create their HTML Blob URL
+inside a sandboxed opaque-origin bootstrap. This allows the Scratch SVG renderer
+to access its own nested SVG sandbox while preventing access to the editor and
+its native bridges. The old opaque outer sandbox caused `contentDocument` to be
+null for the SVG renderer's iframe. Android's separate native player is unchanged.
+
+Validation: all 92 unit tests and lint on the changed player files passed.
+Offline Chrome and the actual x64/ia32 Electron applications rendered a text SVG
+in manual and quality playback; refresh was checked in both environments. The
+player remained cross-origin from the editor and had no desktop/native bridge.
+Both Windows installers were rebuilt. Validation used a synthetic SVG, not the
+user’s specific project.
+
+## Light default and network audit
+
+Theme detection now uses the light default independently of system dark/high-contrast
+preferences. Explicit stored choices and legacy light/dark values remain supported;
+the default accent is unchanged. See docs/NETWORK_AUDIT.md for conditional network
+endpoints and the limits of the observed offline tests. Unit tests, browser tests
+under dark OS preference and a Windows Electron startup check passed.

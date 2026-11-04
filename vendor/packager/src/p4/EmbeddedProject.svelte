@@ -20,9 +20,10 @@
         const project = await task.do(operation.promise);
         projectData = {projectId: null, uniqueId: `@${file.name}`, title: file.name, project};
         task.done();
-        window.parent.postMessage({p4: {type: 'imported'}}, location.origin);
+        window.parent.postMessage({p4: {type: 'imported'}}, location.protocol === 'file:' ? '*' : location.origin);
       } catch (error) {
         task.error(error);
+        window.parent.postMessage({p4: {type: 'build-error'}}, location.protocol === 'file:' ? '*' : location.origin);
       }
     }
   });

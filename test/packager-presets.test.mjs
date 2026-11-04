@@ -15,8 +15,8 @@ test('quality presets set exact requested playback controls without mutating pro
         assert.equal(result.resizeMode, 'preserve-ratio');
         assert.equal(result.autoplay, true);
         assert.equal(result.cursor.type, 'auto');
-        assert.deepEqual(result.controls, {greenFlag: {enabled: false}, stopAll: {enabled: true},
-            pause: {enabled: true}, fullscreen: {enabled: true}});
+        assert.deepEqual(result.controls, {greenFlag: {enabled: false}, stopAll: {enabled: false},
+            pause: {enabled: false}, fullscreen: {enabled: false}});
         assert.equal(result.compiler.enabled, true);
         assert.equal(result.app.windowTitle, 'My project');
         assert.equal(identifyQualityPreset(result, defaults), quality);

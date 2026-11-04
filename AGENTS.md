@@ -4,12 +4,12 @@ The File menu packager is an embedded HTML-only tool, not an external website.
 Read [docs/EMBEDDED_PACKAGER.md](docs/EMBEDDED_PACKAGER.md) before changing its
 iframe protocol, pinned vendor sources, local scaffolding or native export bridges.
 Preserve automatic current-project import, fa/ar/en, no intro/project chooser,
-Downloads save, native sharing and the main-frame/origin restrictions. Every build
+Android HTML saves in the private My Projects library, browser/Windows Downloads saves, native sharing and the main-frame/origin restrictions. Every build
 must include `build/packager`; `build:android` also packages it in both Windows builds.
 Quality presets default to Medium and Advanced settings stay collapsed. Successful
 generation shows a cancellable loading screen for at least five seconds total.
 Direct play uses a sandboxed iframe in browser/Electron and the Android client's
-separate bridge-free PackagedPlayerActivity. Never run packaged HTML in an Android
+separate bridge-free PackagedHtmlPlayer within ScratchScreen. Never run packaged HTML in an Android
 WebView that has the editor's JavaScript interfaces. Android saved-project commands can arrive during startup. Queue them until a
 SHOWING project state before fetching/dispatching an upload. Keep the native entry
 point available during startup so the host's bounded polling cannot lose a command.
@@ -92,3 +92,39 @@ The editor HTML configures `width=1024, user-scalable=no` before its first layou
 only for the exact Android asset origin or a native Android bridge. Preserve the
 ordinary desktop/Electron viewport and do not rely on the host's Windows UA to
 detect Android. Keep this initialization before the editor bundles load.
+
+All packager presets disable stop, pause and fullscreen controls inside the HTML.
+Preset selection and Advanced checkboxes use the same options store. The Android
+HTML player keeps the existing left rail visible, including during custom HTML
+fullscreen. Hide Home and WindowsScrollBar while playing; show localized Refresh
+and Close icons there instead. Restore Home/scrollbar on closing without recreating
+the editor WebView. Floating keyboard events must target the player while active.
+
+The toolbar quality-run button automatically packages a high-quality snapshot
+without the manual packager five-second minimum delay. It shares the export bridge
+and releases its builder/player on completion/close. Preserve editor VM identity.
+Restore/FPS/Advanced messages live in `src/lib/tw-translations/editor-extras.json`.
+Visible app explanations use localized Scratch Farsi branding; preserve upstream
+URLs, attribution and technical identifiers. The first toolbar item is the inert
+Persian image documented in `docs/TOOLBAR_BRANDING.md`, without a Home link.
+
+## Auto Builder integration
+
+The sibling `../auto-builder/README.md` describes the local Windows build tool.
+When changing Android/Windows build commands, outputs, prerequisites or asset
+contracts, update Auto Builder and its safety checks and documentation as well.
+The Android host owns shared-media deduplication; do not deduplicate its raw inputs.
+
+Desktop HTML playback must create its Blob URL inside the opaque-origin data
+bootstrap in `src/lib/isolated-player.js`. The player needs its nested SVG
+sandbox to be same-origin with the player, while remaining cross-origin from
+the editor and its bridges. Preserve this boundary on changes to playback.
+
+The duplicate Advanced toolbar item and Block Colors link to addon customization
+are intentionally absent. Advanced Settings remains in Edit; preserve addon code.
+Desktop file save messages `tw.saveTo`, `tw.saveAs`, `tw.oldDownload` have fa/ar
+translations in editor-extras.json, including the `{file}` placeholder.
+
+GUI and block colors default to Theme.light regardless of OS theme/contrast;
+explicit user theme choices must persist. See docs/NETWORK_AUDIT.md for current
+offline assets, conditional network access, and the scope of observed behavior.

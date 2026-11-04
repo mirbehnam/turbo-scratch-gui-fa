@@ -1,3 +1,4 @@
+import {rebrandInterfaceMessages} from '../lib/interface-branding.js';
 import {addLocaleData} from 'react-intl';
 
 import locales, {localeData, isRtl, pickSupportedMessages, messageOverrides} from '../lib/supported-locales';
@@ -8,7 +9,10 @@ import {LANGUAGE_KEY} from '../lib/detect-locale.js';
 
 const editorMessages = pickSupportedMessages(allEditorMessages);
 addAdditionalTranslations(editorMessages);
-Object.keys(editorMessages).forEach(locale => Object.assign(editorMessages[locale], messageOverrides[locale]));
+Object.keys(editorMessages).forEach(locale => {
+    Object.assign(editorMessages[locale], messageOverrides[locale]);
+    editorMessages[locale] = rebrandInterfaceMessages(editorMessages[locale], locale);
+});
 addLocaleData(localeData);
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';

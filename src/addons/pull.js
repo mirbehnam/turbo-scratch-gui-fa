@@ -185,6 +185,9 @@ const normalizeManifest = (id, manifest) => {
         manifest.enabledByDefault = enabledByDefaultOverrides[id];
         delete manifest.enabledByDefaultMobile;
     }
+    if (id === 'hide-flyout') {
+        manifest.settings.find(setting => setting.id === 'toggle').default = 'category';
+    }
     const KEEP_TAGS = [
         'recommended',
         'theme',
@@ -325,6 +328,22 @@ const processAddon = (id, oldDirectory, newDirectory) => {
                 includeImportedLibraries(contents);
                 contents = includePolyfills(contents, newPath);
                 contents = rewriteAssetImports(contents);
+            }
+
+            if (id === 'hide-flyout' && file === 'userscript.js') {
+                const marker = '    const toolbox = document.querySelector(".blocklyToolboxDiv");';
+                if (!contents.includes(marker)) {
+                    throw new Error('hide-flyout: update the mobile category tap integration');
+                }
+                contents = `import {installTouchCategoryTap} from '../../mobile-category-tap.js';\n\n${
+                    contents.replace(marker, `${marker}
+    installTouchCategoryTap(toolbox, Blockly, () => addon.self.disabled, getToggleSetting,
+      () => !flyOut.classList.contains("sa-flyoutClose"), (open) => {
+        toggle = open;
+        if (open) onmouseenter();
+        else onmouseleave();
+      });`)}
+`;
             }
 
             detectUnimplementedAPIs(id, contents);

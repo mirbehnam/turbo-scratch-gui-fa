@@ -1,53 +1,22 @@
-import {BLOCKS_CUSTOM, Theme} from '.';
-
-const matchMedia = query => (window.matchMedia ? window.matchMedia(query) : null);
-const PREFERS_HIGH_CONTRAST_QUERY = matchMedia('(prefers-contrast: more)');
-const PREFERS_DARK_QUERY = matchMedia('(prefers-color-scheme: dark)');
+import {BLOCKS_CUSTOM, Theme} from './index.js';
 
 const STORAGE_KEY = 'tw:theme';
 
 /**
- * @returns {Theme} detected theme
+ * @returns {Theme} default theme
  */
-const systemPreferencesTheme = () => {
-    if (PREFERS_HIGH_CONTRAST_QUERY && PREFERS_HIGH_CONTRAST_QUERY.matches) {
-        return Theme.highContrast;
-    }
-    if (PREFERS_DARK_QUERY && PREFERS_DARK_QUERY.matches) {
-        return Theme.dark;
-    }
-    return Theme.light;
-};
+const defaultTheme = () => Theme.light;
 
 /**
- * @param {function} onChange callback; no guarantees about arguments
- * @returns {function} call to remove event listeners to prevent memory leak
+ * @returns {function} no-op cleanup; the default does not follow system theme
  */
-const onSystemPreferenceChange = onChange => {
-    if (
-        !PREFERS_HIGH_CONTRAST_QUERY ||
-        !PREFERS_DARK_QUERY ||
-        // Some old browsers don't support addEventListener on media queries
-        !PREFERS_HIGH_CONTRAST_QUERY.addEventListener ||
-        !PREFERS_DARK_QUERY.addEventListener
-    ) {
-        return () => {};
-    }
-
-    PREFERS_HIGH_CONTRAST_QUERY.addEventListener('change', onChange);
-    PREFERS_DARK_QUERY.addEventListener('change', onChange);
-
-    return () => {
-        PREFERS_HIGH_CONTRAST_QUERY.removeEventListener('change', onChange);
-        PREFERS_DARK_QUERY.removeEventListener('change', onChange);
-    };
-};
+const onSystemPreferenceChange = () => () => {};
 
 /**
  * @returns {Theme} the theme
  */
 const detectTheme = () => {
-    const systemPreferences = systemPreferencesTheme();
+    const defaults = defaultTheme();
 
     try {
         const local = localStorage.getItem(STORAGE_KEY);
@@ -63,32 +32,32 @@ const detectTheme = () => {
         const parsed = JSON.parse(local);
         // Any invalid values in storage will be handled by Theme itself
         return new Theme(
-            parsed.accent || systemPreferences.accent,
-            parsed.gui || systemPreferences.gui,
-            parsed.blocks || systemPreferences.blocks
+            parsed.accent || defaults.accent,
+            parsed.gui || defaults.gui,
+            parsed.blocks || defaults.blocks
         );
     } catch (e) {
         // ignore
     }
 
-    return systemPreferences;
+    return defaults;
 };
 
 /**
  * @param {Theme} theme the theme
  */
 const persistTheme = theme => {
-    const systemPreferences = systemPreferencesTheme();
+    const defaults = defaultTheme();
     const nonDefaultSettings = {};
 
-    if (theme.accent !== systemPreferences.accent) {
+    if (theme.accent !== defaults.accent) {
         nonDefaultSettings.accent = theme.accent;
     }
-    if (theme.gui !== systemPreferences.gui) {
+    if (theme.gui !== defaults.gui) {
         nonDefaultSettings.gui = theme.gui;
     }
     // custom blocks are managed by addon at runtime, don't save here
-    if (theme.blocks !== systemPreferences.blocks && theme.blocks !== BLOCKS_CUSTOM) {
+    if (theme.blocks !== defaults.blocks && theme.blocks !== BLOCKS_CUSTOM) {
         nonDefaultSettings.blocks = theme.blocks;
     }
 

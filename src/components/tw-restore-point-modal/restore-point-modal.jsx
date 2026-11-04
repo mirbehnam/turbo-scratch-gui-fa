@@ -14,6 +14,7 @@ const messages = defineMessages({
         description: 'Title of restore point management modal',
         id: 'tw.restorePoints.title'
     },
+    milliseconds: {defaultMessage: 'every {n} milliseconds', id: 'tw.restorePoints.milliseconds'},
     never: {
         defaultMessage: 'never',
         id: 'tw.restorePoints.never',
@@ -67,7 +68,7 @@ const IntervalSelector = props => (
             // This should never happen unless someone manually edits their storage, so we
             // don't need to worry about making this work good.
             <option value={props.value}>
-                {`every ${props.value}ms`}
+                {props.intl.formatMessage(messages.milliseconds, {n: props.value})}
             </option>
         )}
     </select>

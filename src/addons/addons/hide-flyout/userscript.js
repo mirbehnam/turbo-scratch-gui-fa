@@ -1,3 +1,5 @@
+import {installTouchCategoryTap} from '../../mobile-category-tap.js';
+
 export default async function ({ addon, console, msg }) {
   let placeHolderDiv = null;
   let lockObject = null;
@@ -276,6 +278,12 @@ export default async function ({ addon, console, msg }) {
     toggle = false;
 
     const toolbox = document.querySelector(".blocklyToolboxDiv");
+    installTouchCategoryTap(toolbox, Blockly, () => addon.self.disabled, getToggleSetting,
+      () => !flyOut.classList.contains("sa-flyoutClose"), (open) => {
+        toggle = open;
+        if (open) onmouseenter();
+        else onmouseleave();
+      });
     const addExtensionButton = document.querySelector("[class^=gui_extension-button-container_]");
 
     for (let element of [toolbox, addExtensionButton, flyOut, scrollBar]) {

@@ -52,7 +52,7 @@ try {
 const embeddedTheme = new URLSearchParams(location.search).get('theme');
 if (POSSIBLE_THEMES.includes(embeddedTheme)) theme.set(embeddedTheme);
 window.addEventListener('message', event => {
-  if (event.origin !== location.origin || event.source !== window.parent) return;
+  if (event.origin !== (location.protocol === 'file:' ? 'null' : location.origin) || event.source !== window.parent) return;
   const data = event.data && event.data.p4;
   if (data && data.type === 'configure') {
     if (POSSIBLE_THEMES.includes(data.theme)) theme.set(data.theme);

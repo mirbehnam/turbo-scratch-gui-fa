@@ -1,5 +1,5 @@
 <script>
-  import {onDestroy} from 'svelte';
+  import {onDestroy, onMount, tick} from 'svelte';
   // Standard JSON can't represent values such as Infinity, which some options use.
   import * as ExtendedJSON from '@turbowarp/json';
   import {_} from '../locales/';
@@ -26,6 +26,7 @@
 
   export let projectData;
   export let title;
+  const automaticBuild = new URLSearchParams(location.search).get('autobuild') === 'high';
 
   const cloudVariables = projectData.project.analysis.stageVariables
     .filter(i => i.isCloud)
@@ -54,6 +55,7 @@
 
   let result = null;
   let building = false;
+  let disposed = false;
   let buildController;
   $: selectedPreset = identifyQualityPreset($options, defaultOptions);
   const resetResult = () => { result = null; };
@@ -154,17 +156,27 @@
     task.whenAbort(() => buildController.abort());
     try {
       const output = await task.do(runPackager(task, deepClone($options)));
-      await waitForMinimumBuildTime(started, buildController.signal);
+      if (!automaticBuild) await waitForMinimumBuildTime(started, buildController.signal);
       result = output;
       task.done();
       window.parent.postMessage({p4: {type: 'export-ready', name: result.filename,
-        mime: result.type, blob: result.blob}}, location.origin);
+        mime: result.type, blob: result.blob}}, location.protocol === 'file:' ? '*' : location.origin);
     } catch (e) {
-      if (!task.aborted) task.error(e);
+      if (!task.aborted) {
+        task.error(e);
+        window.parent.postMessage({p4: {type: 'build-error'}}, location.protocol === 'file:' ? '*' : location.origin);
+      }
     } finally {
       building = false;
     }
   };
+
+  onMount(() => {
+    if (automaticBuild) {
+      selectPreset('high');
+      tick().then(() => { if (!disposed) pack(); });
+    }
+  });
 
   const resetOptions = (properties) => {
     for (const key of properties) {
@@ -242,6 +254,7 @@
   };
 
   onDestroy(() => {
+    disposed = true;
     if (buildController) buildController.abort();
     currentTask.abort();
   });

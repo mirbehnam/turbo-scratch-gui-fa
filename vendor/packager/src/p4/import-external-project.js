@@ -21,7 +21,8 @@ const importFromParent = ({
   onFinishImporting,
   onCancelImporting
 }) => {
-  if (!origin.startsWith('http:') && !origin.startsWith('https:')) {
+  const localFileParent = location.protocol === 'file:' && (origin === 'null' || origin === 'file://') && window.parent !== window;
+  if (!localFileParent && !origin.startsWith('http:') && !origin.startsWith('https:')) {
     console.warn('Import ignored: invalid origin');
     return;
   }
@@ -37,7 +38,7 @@ const importFromParent = ({
     try {
       opener.postMessage({
         p4: data
-      }, origin);
+      }, localFileParent ? '*' : origin);
     } catch (e) {
       console.warn('Cannot post message', e);
     }
@@ -47,7 +48,8 @@ const importFromParent = ({
   let hasFinishedOrCancelled = false;
 
   const onMessage = (e) => {
-    if (e.origin !== origin || e.source !== opener) {
+    const sameOrigin = e.origin === origin || (localFileParent && (e.origin === 'null' || e.origin === 'file://'));
+    if (!sameOrigin || e.source !== opener) {
       return;
     }
 

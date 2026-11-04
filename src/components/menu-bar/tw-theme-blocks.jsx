@@ -16,7 +16,6 @@ import threeIcon from './tw-blocks-three.svg';
 import highContrastIcon from './tw-blocks-high-contrast.svg';
 import darkIcon from './tw-blocks-dark.svg';
 import customIcon from './tw-blocks-custom.svg';
-import openLinkIcon from './tw-open-link.svg';
 
 const options = defineMessages({
     [BLOCKS_THREE]: {
@@ -33,11 +32,6 @@ const options = defineMessages({
         defaultMessage: 'Dark (Beta)',
         description: 'Name of the dark block colors',
         id: 'tw.blockColors.dark'
-    },
-    [BLOCKS_CUSTOM]: {
-        defaultMessage: 'Customize in Addon Settings',
-        description: 'Link in block color list to open addon settings for more customization',
-        id: 'tw.blockColors.custom'
     }
 });
 
@@ -72,15 +66,6 @@ const ThemeMenuItem = ({id, disabled, isSelected, onClick}) => (
             />
             <ThemeIcon id={id} />
             <FormattedMessage {...options[id]} />
-            {id === BLOCKS_CUSTOM && (
-                <img
-                    width={20}
-                    height={20}
-                    className={styles.openLink}
-                    src={openLinkIcon}
-                    draggable={false}
-                />
-            )}
         </div>
     </MenuItem>
 );
@@ -96,7 +81,6 @@ const BlocksThemeMenu = ({
     isOpen,
     isRtl,
     onChangeTheme,
-    onOpenCustomSettings,
     onOpenMenu,
     theme
 }) => (
@@ -123,20 +107,15 @@ const BlocksThemeMenu = ({
             {[
                 BLOCKS_THREE,
                 BLOCKS_HIGH_CONTRAST,
-                BLOCKS_DARK,
-                ...(onOpenCustomSettings ? [BLOCKS_CUSTOM] : [])
+                BLOCKS_DARK
             ].map(i => (
                 <ThemeMenuItem
                     key={i}
                     id={i}
                     isSelected={theme.blocks === i}
                     // eslint-disable-next-line react/jsx-no-bind
-                    onClick={
-                        i === BLOCKS_CUSTOM ?
-                            onOpenCustomSettings :
-                            () => onChangeTheme(theme.set('blocks', i))
-                    }
-                    disabled={i !== BLOCKS_CUSTOM && theme.blocks === BLOCKS_CUSTOM}
+                    onClick={() => onChangeTheme(theme.set('blocks', i))}
+                    disabled={theme.blocks === BLOCKS_CUSTOM}
                 />
             ))}
         </Submenu>
@@ -147,7 +126,6 @@ BlocksThemeMenu.propTypes = {
     isOpen: PropTypes.bool,
     isRtl: PropTypes.bool,
     onChangeTheme: PropTypes.func,
-    onOpenCustomSettings: PropTypes.func,
     onOpenMenu: PropTypes.func,
     theme: PropTypes.instanceOf(Theme)
 };

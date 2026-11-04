@@ -38,7 +38,7 @@ const messages = defineMessages({
     loadError: {
         defaultMessage: 'Error loading restore point: {error}',
         description: 'Error message when a restore point could not be loaded',
-        id: 'tw.restorePoints.error'
+        id: 'tw.restorePoints.loadError'
     },
     exportError: {
         defaultMessage: 'Error exporting restore point: {error}',

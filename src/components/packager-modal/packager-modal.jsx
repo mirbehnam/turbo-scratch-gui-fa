@@ -16,6 +16,7 @@ const messages = defineMessages({
     run: {id: 'tw.packager.run', defaultMessage: 'Run directly'},
     working: {id: 'tw.packager.working', defaultMessage: 'Please wait…'},
     saved: {id: 'tw.packager.saved', defaultMessage: 'Saved to Downloads: {name}'},
+    stored: {id: 'tw.packager.stored', defaultMessage: 'Saved in My Projects: {name}'},
     downloading: {id: 'tw.packager.downloading', defaultMessage: 'Download requested: {name}'},
     shared: {id: 'tw.packager.shared', defaultMessage: 'The sharing window was opened.'},
     // eslint-disable-next-line max-len
@@ -101,7 +102,8 @@ const PackagerModal = ({intl, vm, title, theme, onClose}) => {
         try {
             const response = await exportPackagedFile(result.blob, result.name, action, intl.locale);
             const message = action === 'share' ? messages.shared :
-                (response.downloadStarted ? messages.downloading : messages.saved);
+                (response.location === 'library' ? messages.stored :
+                    (response.downloadStarted ? messages.downloading : messages.saved));
             setStatus(format(message, {name: response.name || result.name}));
         } catch (err) {
             if (err.name !== 'AbortError') {

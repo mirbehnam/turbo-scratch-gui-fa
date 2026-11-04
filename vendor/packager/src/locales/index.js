@@ -11,7 +11,7 @@ locale.subscribe(language => {
   document.documentElement.dir = language === 'en' ? 'ltr' : 'rtl';
 });
 window.addEventListener('message', event => {
-  if (event.origin !== location.origin || event.source !== window.parent) return;
+  if (event.origin !== (location.protocol === 'file:' ? 'null' : location.origin) || event.source !== window.parent) return;
   if (event.data && event.data.p4 && event.data.p4.type === 'configure' && supported.includes(event.data.p4.locale)) {
     locale.set(event.data.p4.locale);
   }

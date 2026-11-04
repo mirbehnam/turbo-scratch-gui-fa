@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {FormattedMessage, FormattedDate, FormattedTime, FormattedRelative} from 'react-intl';
+import {
+    FormattedMessage, FormattedDate, FormattedTime, FormattedRelative, defineMessages, injectIntl, intlShape
+} from 'react-intl';
 import bindAll from 'lodash.bindall';
 import styles from './restore-point-modal.css';
 import {formatBytes} from '../../lib/tw-bytes-utils';
@@ -8,6 +10,11 @@ import RestorePointAPI from '../../lib/tw-restore-point-api';
 import log from '../../lib/log';
 import exportIcon from './export.svg';
 import deleteIcon from './delete.svg';
+
+const messages = defineMessages({
+    export: {id: 'tw.restorePoints.export', defaultMessage: 'Export project file'},
+    delete: {id: 'tw.restorePoints.delete', defaultMessage: 'Delete restore point'}
+});
 
 // Browser support is not perfect yet
 const relativeTimeSupported = () => typeof Intl !== 'undefined' && typeof Intl.RelativeTimeFormat !== 'undefined';
@@ -140,11 +147,13 @@ class RestorePoint extends React.Component {
                     <button
                         className={styles.restorePointButton}
                         onClick={this.handleClickExport}
+                        aria-label={this.props.intl.formatMessage(messages.export)}
+                        title={this.props.intl.formatMessage(messages.export)}
                         disabled={this.props.isExporting}
                     >
                         <img
                             src={exportIcon}
-                            alt="Export"
+                            alt=""
                             draggable={false}
                         />
                     </button>
@@ -152,11 +161,13 @@ class RestorePoint extends React.Component {
                     <button
                         className={styles.restorePointButton}
                         onClick={this.handleClickDelete}
+                        aria-label={this.props.intl.formatMessage(messages.delete)}
+                        title={this.props.intl.formatMessage(messages.delete)}
                         disabled={this.props.isExporting}
                     >
                         <img
                             src={deleteIcon}
-                            alt="Delete"
+                            alt=""
                             draggable={false}
                         />
                     </button>
@@ -167,6 +178,7 @@ class RestorePoint extends React.Component {
 }
 
 RestorePoint.propTypes = {
+    intl: intlShape.isRequired,
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     created: PropTypes.number.isRequired,
@@ -179,4 +191,4 @@ RestorePoint.propTypes = {
     onClickLoad: PropTypes.func.isRequired
 };
 
-export default RestorePoint;
+export default injectIntl(RestorePoint);

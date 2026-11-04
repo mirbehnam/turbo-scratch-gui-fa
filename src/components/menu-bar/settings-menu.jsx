@@ -20,7 +20,6 @@ const SettingsMenu = ({
     canChangeTheme,
     isRtl,
     onClickDesktopSettings,
-    onOpenCustomSettings,
     onRequestClose,
     onRequestOpen,
     settingsMenuOpen
@@ -58,9 +57,7 @@ const SettingsMenu = ({
                 {canChangeTheme && (
                     <React.Fragment>
                         <TWGuiThemeMenu />
-                        <TWBlocksThemeMenu
-                            onOpenCustomSettings={onOpenCustomSettings}
-                        />
+                        <TWBlocksThemeMenu />
                         <TWAccentThemeMenu />
                     </React.Fragment>
                 )}
@@ -74,7 +71,6 @@ SettingsMenu.propTypes = {
     canChangeTheme: PropTypes.bool,
     isRtl: PropTypes.bool,
     onClickDesktopSettings: PropTypes.func,
-    onOpenCustomSettings: PropTypes.func,
     onRequestClose: PropTypes.func,
     onRequestOpen: PropTypes.func,
     settingsMenuOpen: PropTypes.bool

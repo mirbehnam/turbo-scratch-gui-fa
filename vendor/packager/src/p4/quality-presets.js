@@ -10,9 +10,9 @@ export const createQualityPreset = (defaults, quality) => {
   options.cursor.type = 'auto';
   options.controls = {
     greenFlag: {enabled: false},
-    stopAll: {enabled: true},
-    pause: {enabled: true},
-    fullscreen: {enabled: true}
+    stopAll: {enabled: false},
+    pause: {enabled: false},
+    fullscreen: {enabled: false}
   };
   return options;
 };

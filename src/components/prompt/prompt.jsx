@@ -47,8 +47,10 @@ const Packager = () => (
         target="_blank"
         rel="noopener noreferrer"
     >
-        {/* Should not be translated */}
-        {'TurboWarp Packager'}
+        <FormattedMessage
+            id="tw.prompt.packager"
+            defaultMessage="Project packager"
+        />
     </a>
 );
 

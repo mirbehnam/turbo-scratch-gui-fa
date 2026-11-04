@@ -84,7 +84,7 @@ const manifest = {
           "name": "Category click"
         }
       ],
-      "default": "cathover"
+      "default": "category"
     },
     {
       "dynamic": true,

@@ -20,6 +20,8 @@ import MenuBarMenu from './menu-bar-menu.jsx';
 import MenuLabel from './tw-menu-label.jsx';
 import {MenuItem, MenuSection} from '../menu/menu.jsx';
 import ProjectTitleInput from './project-title-input.jsx';
+import QualityRunButton from '../quality-run/quality-run.jsx';
+import persianLogo from './scratch-farsi-toolbar.png';
 import AuthorInfo from './author-info.jsx';
 import SB3Downloader from '../../containers/sb3-downloader.jsx';
 import DeletionRestorer from '../../containers/deletion-restorer.jsx';
@@ -92,12 +94,7 @@ import fileIcon from './icon--file.svg';
 import editIcon from './icon--edit.svg';
 import addonsIcon from './addons.svg';
 import errorIcon from './tw-error.svg';
-import advancedIcon from './tw-advanced.svg';
 
-import ninetiesLogo from './nineties_logo.svg';
-import catLogo from './cat_logo.svg';
-import prehistoricLogo from './prehistoric-logo.svg';
-import oldtimeyLogo from './oldtimey-logo.svg';
 
 import sharedMessages from '../../lib/shared-messages';
 
@@ -107,6 +104,7 @@ import {notScratchDesktop} from '../../lib/isScratchDesktop.js';
 const SHOW_ADDONS_BUTTON = false;
 
 const twMessages = defineMessages({
+    brand: {id: 'tw.brand.name', defaultMessage: 'Scratch Farsi'},
     compileError: {
         id: 'tw.menuBar.compileError',
         defaultMessage: '{sprite}: {error}',
@@ -295,19 +293,6 @@ class MenuBar extends React.Component {
                 document.documentElement.style.height = '';
             }
 
-            // Change logo for modes
-            if (mode === '1990') {
-                document.getElementById('logo_img').src = ninetiesLogo;
-            } else if (mode === '2020') {
-                document.getElementById('logo_img').src = catLogo;
-            } else if (mode === '1920') {
-                document.getElementById('logo_img').src = oldtimeyLogo;
-            } else if (mode === '220022BC') {
-                document.getElementById('logo_img').src = prehistoricLogo;
-            } else {
-                document.getElementById('logo_img').src = this.props.logo;
-            }
-
             this.props.onSetTimeTravelMode(mode);
         };
     }
@@ -322,9 +307,9 @@ class MenuBar extends React.Component {
         if (modifier) {
             if (event.key.toLowerCase() === 's') {
                 this.props.handleSaveProject();
-                event.preventDefault();    
+                event.preventDefault();
             } else if (event.key.toLowerCase() === 'o') {
-                event.preventDefault();    
+                event.preventDefault();
                 this.props.onStartSelectingFileUpload();
             }
         }
@@ -473,6 +458,14 @@ class MenuBar extends React.Component {
             >
                 <div className={styles.mainMenu}>
                     <div className={styles.fileGroup}>
+                        <div className={styles.branding}>
+                            <img
+                                id="logo_img"
+                                src={persianLogo}
+                                alt={this.props.intl.formatMessage(twMessages.brand)}
+                                draggable={false}
+                            />
+                        </div>
                         {this.props.errors.length > 0 && <div>
                             <MenuLabel
                                 open={this.props.errorsMenuOpen}
@@ -531,11 +524,6 @@ class MenuBar extends React.Component {
                             onClickDesktopSettings={
                                 this.props.onClickDesktopSettings &&
                                 this.handleClickDesktopSettings
-                            }
-                            // eslint-disable-next-line react/jsx-no-bind
-                            onOpenCustomSettings={
-                                this.props.onClickAddonSettings &&
-                                this.props.onClickAddonSettings.bind(null, 'editor-theme3')
                             }
                             onRequestClose={this.props.onRequestCloseSettings}
                             onRequestOpen={this.props.onClickSettings}
@@ -848,26 +836,7 @@ class MenuBar extends React.Component {
                                 </span>
                             </div>
                         )}
-                        {this.props.onClickSettingsModal && (
-                            <div
-                                className={classNames(styles.menuBarItem, styles.hoverable)}
-                                onClick={this.props.onClickSettingsModal}
-                            >
-                                <img
-                                    src={advancedIcon}
-                                    draggable={false}
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className={styles.collapsibleLabel}>
-                                    <FormattedMessage
-                                        defaultMessage="Advanced"
-                                        description="Button to open advanced settings menu"
-                                        id="tw.menuBar.advanced"
-                                    />
-                                </span>
-                            </div>
-                        )}
+
                     </div>
 
                     <Divider className={styles.divider} />
@@ -893,6 +862,11 @@ class MenuBar extends React.Component {
                             username={this.props.authorUsername}
                         />
                     ) : null)}
+                    {this.props.canEditTitle && <QualityRunButton
+                        vm={this.props.vm}
+                        title={this.props.projectTitle}
+                        disabled={!this.props.isShowingProject}
+                    />}
                     {this.props.canShare ? (
                         (this.props.isShowingProject || this.props.isUpdating) && (
                             <div className={classNames(styles.menuBarItem)}>
